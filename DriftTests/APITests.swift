@@ -7,6 +7,7 @@
 //
 
 import XCTest
+import ObjectMapper
 @testable import Drift
 
 
@@ -27,7 +28,7 @@ class APITests: XCTestCase {
         
         let expectation = expectationWithDescription("API Will call Auth")
         
-        let embed = Embed(json: JSONStore.convertStringToDictionary(JSONStore.embedJSONCorrect)!)
+        let embed = Mapper<Embed>().map(JSONStore.convertStringToDictionary(JSONStore.embedJSONCorrect)!)
 
         XCTAssertNotNil(embed)
         DriftDataStore.sharedInstance.setEmbed(embed!)

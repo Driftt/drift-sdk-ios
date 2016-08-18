@@ -6,12 +6,12 @@
 //  Copyright © 2016 Drift. All rights reserved.
 //
 
-import Gloss
-class Campaign: Decodable {
+import ObjectMapper
+class Campaign: Mappable {
     
     /**
         The type of message that the SDK can parse
-        - Announcment: Announcment Campaign
+        - Announcement: Announcement Campaign
         - NPS: NPS Campaign
         - NPS Response: Response to an NPS Campaign - Don't show NPS is conversation contains NPS Response
      */
@@ -24,38 +24,45 @@ class Campaign: Decodable {
     var orgId: Int?
     var id: Int?
     var uuid: String?
-    var messageType: MessageType?
+    var messageType: MessageType!
     var createdAt: NSDate?
     var bodyText: String?
     var authorId: Int?
     var conversationId: Int?
     
     var npsAttributes: NPSAttributes?
-    var announcmentAttributes: AnnouncmentAttributes?
+    var announcementAttributes: AnnouncementAttributes?
     var npsResponseAttributes: NPSResponseAttributes? 
     
-    required init?(json: JSON) {
+    required convenience init?(_ map: Map) {
         
-        self.orgId = "orgId" <~~ json
-        self.id = "id" <~~ json
-        self.uuid = "uuid" <~~ json
-        self.messageType = "type" <~~ json
-        self.createdAt = Decoder.decodeDriftDate("createdAt", json: json)
-        self.bodyText = "body" <~~ json
-        self.authorId = "authorId" <~~ json
-        self.conversationId = "conversationId" <~~ json
+        if map.JSONDictionary["type"] as? String == nil || MessageType(rawValue: map.JSONDictionary["type"] as! String) == nil{
+            LoggerManager.log(map.JSONDictionary["type"] as? String ?? "")
+            return nil
+        }
         
+        self.init()
+    }
+    
+    func mapping(map: Map) {
+        orgId           <- map["orgId"]
+        id              <- map["id"]
+        uuid            <- map["uuid"]
+        messageType     <- map["type"]
+        createdAt       <- (map["createdAt"], DateTransform())
+        bodyText        <- map["body"]
+        authorId        <- map["authorId"]
+        conversationId  <- map["conversationId"]
         
         if let messageType = messageType {
-            
             switch messageType {
             case .Announcement:
-                self.announcmentAttributes = "attributes" <~~ json
+                announcementAttributes <- map["attributes"]
             case .NPS:
-                self.npsAttributes = "attributes" <~~ json
+                npsAttributes         <- map["attributes"]
             case .NPSResponse:
-                self.npsResponseAttributes = "attributes" <~~ json
-            }   
+                npsResponseAttributes <- map["attributes"]
+            }
         }
     }
 }

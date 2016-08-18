@@ -1,5 +1,5 @@
 //
-//  AnnouncmentExpandedView.swift
+//  AnnouncementExpandedView.swift
 //  Drift
 //
 //  Created by Eoin O'Connell on 19/02/2016.
@@ -10,7 +10,7 @@ import UIKit
 import SafariServices
 import MessageUI
 
-class AnnouncmentExpandedView: CampaignView, UIScrollViewDelegate {
+class AnnouncementExpandedView: CampaignView, UIScrollViewDelegate {
     var campaign: Campaign! {
         didSet{
             setupForCampaign()
@@ -59,8 +59,8 @@ class AnnouncmentExpandedView: CampaignView, UIScrollViewDelegate {
     }
     
     @IBOutlet weak var closeButton: UIButton!
-    @IBOutlet weak var announcmentTitleLabel: UILabel!
-    @IBOutlet weak var announcmentInfoTextView: UILabel!
+    @IBOutlet weak var announcementTitleLabel: UILabel!
+    @IBOutlet weak var announcementInfoTextView: UILabel!
     
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var scrollViewContainer: UIView!
@@ -86,7 +86,7 @@ class AnnouncmentExpandedView: CampaignView, UIScrollViewDelegate {
     override func showOnWindow(window: UIWindow) {
         window.addSubview(self)
         
-        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(AnnouncmentExpandedView.didRotate), name: UIApplicationDidChangeStatusBarOrientationNotification, object: nil)
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(AnnouncementExpandedView.didRotate), name: UIApplicationDidChangeStatusBarOrientationNotification, object: nil)
         
         translatesAutoresizingMaskIntoConstraints = false
         
@@ -110,6 +110,7 @@ class AnnouncmentExpandedView: CampaignView, UIScrollViewDelegate {
         
         campaignCreatorImageView.clipsToBounds = true
         campaignCreatorImageView.layer.cornerRadius = 3
+        campaignCreatorImageView.contentMode = .ScaleAspectFill
         
         scrollView.delegate = self
         scrollView.scrollIndicatorInsets = UIEdgeInsets(top: 30, left: 0, bottom: 0, right: 0)
@@ -190,7 +191,7 @@ class AnnouncmentExpandedView: CampaignView, UIScrollViewDelegate {
     
     func setupForCampaign() {
         
-        if let cta = campaign.announcmentAttributes?.cta {
+        if let cta = campaign.announcementAttributes?.cta {
             if let copy = cta.copy {
                 ctaButton.setTitle(copy, forState: .Normal)
             }else{
@@ -203,8 +204,8 @@ class AnnouncmentExpandedView: CampaignView, UIScrollViewDelegate {
             containerView.layoutIfNeeded()
         }
         
-        if let announcment = campaign.announcmentAttributes {
-            announcmentTitleLabel.text = announcment.title ?? ""
+        if let announcement = campaign.announcementAttributes {
+            announcementTitleLabel.text = announcement.title ?? ""
             
             do {
                 let htmlStringData = (campaign.bodyText ?? "").dataUsingEncoding(NSUTF8StringEncoding)!
@@ -212,22 +213,22 @@ class AnnouncmentExpandedView: CampaignView, UIScrollViewDelegate {
                     NSCharacterEncodingDocumentAttribute: NSUTF8StringEncoding
                 ]
                 let attributedHTMLString = try NSMutableAttributedString(data: htmlStringData, options: options, documentAttributes: nil)
-                announcmentInfoTextView.text = attributedHTMLString.string
+                announcementInfoTextView.text = attributedHTMLString.string
             } catch {
-                announcmentInfoTextView.text = campaign.bodyText ?? ""
+                announcementInfoTextView.text = campaign.bodyText ?? ""
             }
             
-            announcmentInfoTextView.font = UIFont(name: "Avenir", size: 16)
+            announcementInfoTextView.font = UIFont(name: "Avenir", size: 16)
             
         }
     
         if let organizerId = campaign.authorId {
             
-            APIManager.campaignOrganizerForId(organizerId, orgId: DriftDataStore.sharedInstance.embed!.orgId, authToken: DriftDataStore.sharedInstance.auth!.accessToken, completion: { (result) -> () in
+            APIManager.getUser(organizerId, orgId: DriftDataStore.sharedInstance.embed!.orgId, authToken: DriftDataStore.sharedInstance.auth!.accessToken, completion: { (result) -> () in
                 switch result {
                 case .Success(let users):
                     if let avatar = users.first?.avatarURL {
-                        self.campaignCreatorImageView.downloadedFrom(avatar, contentMode: .ScaleAspectFill)
+                        self.campaignCreatorImageView.af_setImageWithURL(NSURL.init(string:avatar)!)
                     }
                     if let creatorName = users.first?.name {
                         self.campaignCreatorNameLabel.text = creatorName
@@ -243,23 +244,13 @@ class AnnouncmentExpandedView: CampaignView, UIScrollViewDelegate {
     }
     
     @IBAction func ctaButtonPressed(sender: AnyObject) {
-        delegate?.campaignDidFinishWithResponse(self, campaign: campaign, response: .Announcment(.Clicked))
+        delegate?.campaignDidFinishWithResponse(self, campaign: campaign, response: .Announcement(.Clicked))
         
-        if let cta = campaign?.announcmentAttributes?.cta {
+        if let cta = campaign?.announcementAttributes?.cta {
             
             switch cta.ctaType {
             case .Some(.ChatResponse):
-                if let email = DriftDataStore.sharedInstance.embed?.inboxEmailAddress, topVC = TopController.viewController() where email != "" {
-                    
-                    if MFMailComposeViewController.canSendMail() {
-                        let mailVC = MFMailComposeViewController()
-                        mailVC.setToRecipients([email])
-                        mailVC.setSubject(campaign.announcmentAttributes?.title ?? "")
-                        mailVC.mailComposeDelegate = DriftManager.sharedInstance
-                        topVC.presentViewController(mailVC, animated: true, completion: nil)
-                        
-                    }
-                }
+                PresentationManager.sharedInstance.showNewConversationVC(campaign.authorId)
             case .Some(.LinkToURL):
                 if let url = cta.urlLink {
                     presentURL(url)
@@ -273,7 +264,6 @@ class AnnouncmentExpandedView: CampaignView, UIScrollViewDelegate {
             LoggerManager.log("No CTA")
         }
     }
-    
     
     func presentURL(url: NSURL) {
         
@@ -290,7 +280,7 @@ class AnnouncmentExpandedView: CampaignView, UIScrollViewDelegate {
 
     
     @IBAction func pressedClose(sender: AnyObject) {
-        delegate?.campaignDidFinishWithResponse(self, campaign: campaign, response: .Announcment(.Dismissed))
+        delegate?.campaignDidFinishWithResponse(self, campaign: campaign, response: .Announcement(.Dismissed))
     }
     
     override func hideFromWindow() {

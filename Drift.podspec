@@ -14,5 +14,7 @@ Pod::Spec.new do |spec|
   spec.resources = ['Drift/**/*.xib','Drift/**/*.xcassets']
 
   spec.dependency 'LayerKit', '~> 0.17'
-  spec.dependency 'Gloss', '~> 0.7'
+  spec.dependency 'ObjectMapper', '~> 1.2'
+  spec.dependency 'SlackTextViewController', '~> 1.9.3'
+  spec.dependency 'AlamofireImage', '~> 2.0'
 end

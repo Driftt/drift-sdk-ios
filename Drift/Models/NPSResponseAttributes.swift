@@ -6,20 +6,23 @@
 //  Copyright © 2016 Drift. All rights reserved.
 //
 
-import Gloss
+import ObjectMapper
 ///NPS Response
-class NPSResponseAttributes: Decodable {
+class NPSResponseAttributes: Mappable {
     
     var campaignId: Int?
     var dismissed: Bool?
     var numericResponse: Int?
     var textResponse:String?
     
-    required init?(json: JSON) {
-        campaignId = "campaignId" <~~ json
-        dismissed = "dismissed" <~~ json
-        textResponse = "textResponse" <~~ json
-        numericResponse = "numericResponse" <~~ json
+    required convenience init?(_ map: Map) {
+        self.init()
     }
-
+    
+    func mapping(map: Map) {
+        campaignId      <- map["campaignId"]
+        dismissed       <- map["dismissed"]
+        textResponse    <- map["textResponse"]
+        numericResponse <- map["numericResponse"]
+    }
 }

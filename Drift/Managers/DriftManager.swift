@@ -13,7 +13,7 @@ class DriftManager: NSObject {
     
     static var sharedInstance: DriftManager = DriftManager()
     var debug: Bool = false
-    
+    var directoryURL = NSURL()
     ///Used to store register data while we wait for embed to finish in case where register and embed is called together
     var registerInfo: (userId: String, email: String, attrs: [String: AnyObject]?)?
 
@@ -25,6 +25,16 @@ class DriftManager: NSObject {
     
     deinit {
         NSNotificationCenter.defaultCenter().removeObserver(self)
+    }
+    
+    
+    class func createTemporaryDirectory(){
+        sharedInstance.directoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory()).URLByAppendingPathComponent(NSProcessInfo.processInfo().globallyUniqueString, isDirectory: true) as NSURL
+        do {
+            try NSFileManager.defaultManager().createDirectoryAtURL(sharedInstance.directoryURL, withIntermediateDirectories: true, attributes: nil)
+        } catch {
+            sharedInstance.directoryURL = NSURL(fileURLWithPath: NSTemporaryDirectory())
+        }
     }
     
     ///Call Embeds API if needed
@@ -46,8 +56,12 @@ class DriftManager: NSObject {
         }
     }
     
-    class func debugMore(debug:Bool){
+    class func debugMode(debug:Bool){
         sharedInstance.debug = debug
+    }
+    
+    class func showConversations(){
+        PresentationManager.sharedInstance.showConversationList()
     }
     
     /**

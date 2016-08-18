@@ -6,75 +6,53 @@
 //  Copyright © 2016 Drift. All rights reserved.
 //
 
-import Gloss
+import ObjectMapper
 ///Embed - The organisation specific data used to customise the SDK for each organization
-struct Embed: Glossy {
+struct Embed: Mappable {
     
-    var orgId: Int
-    var embedId: String
-    var inboxId: Int
+    var orgId: Int!
+    var embedId: String!
+    var inboxId: Int!
     
-    var layerAppId: String
-    var clientId: String
-    var redirectUri: String
+    var layerAppId: String!
+    var clientId: String!
+    var redirectUri: String!
     
     var backgroundColor: String?
     var foregroundColor: String?
+    var welcomeMessage: String?
     
     var organizationName: String?
     
     var inboxEmailAddress: String?
-    var refreshRate: String?
+    var refreshRate: Int?
     
-    init?(json: JSON) {
-    
-        ///This data is required - Fail Init and don't go further if we don't have these
-        guard let
-            orgId: Int = "orgId" <~~ json,
-            embedId: String = "id" <~~ json,
-            inboxId: Int = "configuration.inboxId" <~~ json,
-            layerAppId: String = "configuration.layerAppId" <~~ json,
-            clientId: String = "configuration.authClientId" <~~ json,
-            redirectUri: String = "configuration.redirectUri" <~~ json
-            where
-            embedId != "" &&
-            layerAppId != "" &&
-            clientId != "" &&
-            redirectUri != ""
-            else { return nil }
+    init?(_ map: Map) {
+        //These fields are required, without them we fail to init the object
+        orgId       = map["orgId"].validNotEmpty()
+        embedId     = map["id"].validNotEmpty()
+        inboxId     = map["configuration.inboxId"].validNotEmpty()
+        layerAppId  = map["configuration.layerAppId"].validNotEmpty()
+        clientId    = map["configuration.authClientId"].validNotEmpty()
+        redirectUri = map["configuration.redirectUri"].validNotEmpty()
         
-        self.orgId = orgId
-        self.embedId = embedId
-        self.inboxId = inboxId
-        self.layerAppId = layerAppId
-        self.clientId = clientId
-        self.redirectUri = redirectUri
-        
-
-        backgroundColor = "configuration.theme.backgroundColor" <~~ json
-        foregroundColor = "configuration.theme.foregroundColor" <~~ json
-        organizationName = "configuration.organizationName" <~~ json
-        inboxEmailAddress = "configuration.inboxEmailAddress" <~~ json
-        refreshRate = "configuration.refreshRate" <~~ json
+        if !map.isValidNotEmpty{
+            return nil
+        }
     }
     
-
-    
-    ///Used when caching Embed
-    func toJSON() -> JSON? {
-        return jsonify([
-            "orgId" ~~> self.orgId,
-            "id" ~~> self.embedId,
-            "configuration.inboxId" ~~> self.inboxId,
-            "configuration.layerAppId" ~~> self.layerAppId,
-            "configuration.authClientId" ~~> self.clientId,
-            "configuration.theme.backgroundColor" ~~> self.backgroundColor,
-            "configuration.theme.foregroundColor" ~~> self.foregroundColor,
-            "configuration.redirectUri" ~~> self.redirectUri,
-            "configuration.organizationName" ~~> self.organizationName,
-            "configuration.inboxEmailAddress" ~~> self.inboxEmailAddress,
-            "configuration.refreshRate" ~~> self.refreshRate
-            ])
+    mutating func mapping(map: Map) {
+        orgId               <- map["orgId"]
+        embedId             <- map["id"]
+        inboxId             <- map["configuration.inboxId"]
+        layerAppId          <- map["configuration.layerAppId"]
+        clientId            <- map["configuration.authClientId"]
+        redirectUri         <- map["configuration.redirectUri"]
+        backgroundColor     <- map["configuration.theme.backgroundColor"]
+        foregroundColor     <- map["configuration.theme.foregroundColor"]
+        welcomeMessage      <- map["configuration.theme.welcomeMessage"]
+        organizationName    <- map["configuration.organizationName"]
+        inboxEmailAddress   <- map["configuration.inboxEmailAddress"]
+        refreshRate         <- map["configuration.refreshRate"]
     }
-    
 }

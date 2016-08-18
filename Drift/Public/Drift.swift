@@ -20,6 +20,7 @@ public class Drift: NSObject {
     */
     public class func setup(embedId: String) {
         DriftManager.retrieveDataFromEmbeds(embedId)
+        DriftManager.createTemporaryDirectory()
     }
     
     /**
@@ -44,13 +45,22 @@ public class Drift: NSObject {
     /**
 
      This mode enables you to see the output logs of drift for debug purposes
-     This will also stop dismissing announcments from being sticky so you can see the same announcment over and over
+     This will also stop dismissing announcements from being sticky so you can see the same announcement over and over
      
      - parameter debug: A Bool indicating if debug mode should be enabled or not
      
     */
     public class func debugMode(debug:Bool) {
-        DriftManager.debugMore(debug)
+        DriftManager.debugMode(debug)
+    }
+    
+    /**
+
+     This will show a list of Drift conversations for the current user
+     
+     */
+    public class func showConversations() {
+        DriftManager.showConversations()
     }
     
 }

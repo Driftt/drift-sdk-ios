@@ -6,9 +6,9 @@
 //  Copyright © 2016 Drift. All rights reserved.
 //
 
-import Gloss
+import ObjectMapper
 ///User obect - Attached to Auth and used to make sure user has not changed during app close
-class User: Glossy {
+class User: Mappable {
     
     var userId: Int?
     var orgId: Int?
@@ -16,26 +16,19 @@ class User: Glossy {
     var name: String?
     var externalId: String?
     var attributes: [String: AnyObject]?
+    var avatarURL: String?
 
-    required init?(json: JSON) {
-        userId = "id" <~~ json
-        email = "email" <~~ json
-        orgId = "orgId" <~~ json
-        name = "name" <~~ json
-        attributes = "attributes" <~~ json
-        externalId = "externalId" <~~ json
+    required convenience init?(_ map: Map) {
+        self.init()
     }
     
-    func toJSON() -> JSON? {
-        return jsonify(
-            [
-                "id" ~~> self.userId,
-                "email" ~~> self.email,
-                "orgId" ~~> self.orgId,
-                "name" ~~> self.name,
-                "externalId" ~~> self.externalId,
-                "attributes" ~~> self.attributes
-            ]
-        )
+    func mapping(map: Map) {
+        userId      <- map["id"]
+        email       <- map["email"]
+        orgId       <- map["orgId"]
+        name        <- map["name"]
+        attributes  <- map["attributes"]
+        externalId  <- map["externalId"]
+        avatarURL   <- map["avatarUrl"]
     }
 }

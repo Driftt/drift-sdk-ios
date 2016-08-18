@@ -30,6 +30,8 @@ class TopController {
             return viewController(top)
         }else if let tabController = topController as? UITabBarController, current = tabController.selectedViewController {
             return viewController(current)
+        }else if let presented = topController as? UIAlertController {
+            return presented.presentingViewController
         }
         
         return topController

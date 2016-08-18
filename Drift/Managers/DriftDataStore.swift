@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import ObjectMapper
 
 ///Datastore for caching Embed and Auth object between app opens
 class DriftDataStore {
@@ -39,7 +40,7 @@ class DriftDataStore {
         let userDefs = NSUserDefaults.standardUserDefaults()
         
         if let data = userDefs.stringForKey(DriftDataStore.driftAuthCacheString), json = convertStringToDictionary(data) {
-            let tempAuth = Auth(json: json)
+            let tempAuth = Auth(JSON: json)
             if let auth =  tempAuth{
                 self.auth = auth
             }else{
@@ -48,7 +49,8 @@ class DriftDataStore {
         }
         
         if let data = userDefs.stringForKey(DriftDataStore.driftEmbedCacheString), json = convertStringToDictionary(data) {
-            let tempEmbed = Embed(json: json)
+            let tempEmbed = Mapper<Embed>().map(json)
+            
             if let embed = tempEmbed {
                 self.embed = embed
             }else{
@@ -60,13 +62,13 @@ class DriftDataStore {
     func saveData(){
         let userDefs = NSUserDefaults.standardUserDefaults()
         
-        if let embed = embed, embedJSON = embed.toJSON(), json = convertDictionaryToString(embedJSON) {
+        if let embed = embed, json = convertDictionaryToString(embed.toJSON()) {
             userDefs.setObject(json, forKey: DriftDataStore.driftEmbedCacheString)
         }else{
             LoggerManager.log("Failed to save embed")
         }
         
-        if let auth = auth, authJSON = auth.toJSON(), json = convertDictionaryToString(authJSON) {
+        if let auth = auth, json = convertDictionaryToString( auth.toJSON()) {
             userDefs.setObject(json, forKey: DriftDataStore.driftAuthCacheString)
         }
         
@@ -78,8 +80,10 @@ class DriftDataStore {
     func removeData(){
         let userDefs = NSUserDefaults.standardUserDefaults()
         userDefs.removeObjectForKey(DriftDataStore.driftAuthCacheString)
+        userDefs.removeObjectForKey(DriftDataStore.driftEmbedCacheString)
         userDefs.synchronize()
         auth = nil
+        embed = nil
     }
     
     
@@ -126,5 +130,8 @@ extension DriftDataStore{
         }
         return UIColor(red:0.54, green:0.4, blue:1, alpha:1)
     }
+    
+    static let primaryFontColor = UIColor(red:0.20, green:0.20, blue:0.20, alpha:1.00)
+    static let secondaryFontColor = UIColor(red:0.60, green:0.60, blue:0.60, alpha:1.00)
     
 }

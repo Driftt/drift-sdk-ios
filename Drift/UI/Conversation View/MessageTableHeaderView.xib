@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB" customClass="MessageTableHeaderView" customModule="Drift" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="499" height="42"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="OHK-u8-TqC">
+                    <rect key="frame" x="0.0" y="22" width="499" height="20"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="20" id="ie5-ir-y0P"/>
+                    </constraints>
+                </view>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="TODAY" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="JVr-DI-6SM">
+                    <rect key="frame" x="15" y="8" width="469" height="29"/>
+                    <fontDescription key="fontDescription" name="Avenir-Black" family="Avenir" pointSize="14"/>
+                    <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+            </subviews>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+            <constraints>
+                <constraint firstItem="OHK-u8-TqC" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="70K-ia-gkh"/>
+                <constraint firstAttribute="trailing" secondItem="OHK-u8-TqC" secondAttribute="trailing" id="BFG-ti-zO2"/>
+                <constraint firstItem="JVr-DI-6SM" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" priority="999" constant="8" id="JSr-GM-fsR"/>
+                <constraint firstAttribute="bottom" secondItem="JVr-DI-6SM" secondAttribute="bottom" constant="5" id="QPC-rd-Kql"/>
+                <constraint firstAttribute="trailing" secondItem="JVr-DI-6SM" secondAttribute="trailing" constant="15" id="UIo-21-fex"/>
+                <constraint firstAttribute="bottom" secondItem="OHK-u8-TqC" secondAttribute="bottom" id="c0N-1c-nyD"/>
+                <constraint firstItem="JVr-DI-6SM" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" constant="15" id="mpt-9k-dVe"/>
+            </constraints>
+            <nil key="simulatedStatusBarMetrics"/>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <connections>
+                <outlet property="bottomFade" destination="OHK-u8-TqC" id="sev-Mi-vQ4"/>
+                <outlet property="headerLabel" destination="JVr-DI-6SM" id="ri6-ps-qNN"/>
+            </connections>
+        </view>
+    </objects>
+</document>
