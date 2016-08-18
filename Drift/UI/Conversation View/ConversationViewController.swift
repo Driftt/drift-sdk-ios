@@ -250,17 +250,30 @@ class ConversationViewController: SLKTextViewController {
     }
     
     
-    override func tableView(tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+    override func tableView(tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        
         let headerView: MessageTableHeaderView =  MessageTableHeaderView.fromNib("MessageTableHeaderView") as! MessageTableHeaderView
-        let message = sections[section][0]
-        headerView.headerLabel.text = dateFormatter.headerStringFromDate(message.createdAt)
+        
+        //This handles the fact we need to have a header on the last (top when inverted) section.
+        if section == 0{
+            return nil
+        }else if sections[section-1].count == 0 {
+            headerView.headerLabel.text = "Today"
+        }else {
+            let message = sections[section-1][0]
+            headerView.headerLabel.text = dateFormatter.headerStringFromDate(message.createdAt)
+        }
+        
         headerView.transform = tableView.transform
         return headerView
     }
     
-    
-    override func tableView(tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        return 42
+    override func tableView(tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        if section == 0{
+            return 0
+        }else{
+            return 42
+        }
     }
     
     func addMessageToConversation(message: Message){
@@ -301,6 +314,8 @@ class ConversationViewController: SLKTextViewController {
             sections.append(section)
         }
         
+        sections.append([])
+
         return sections
     }
 

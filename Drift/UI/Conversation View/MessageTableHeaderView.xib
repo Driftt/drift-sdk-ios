@@ -29,7 +29,7 @@
             <constraints>
                 <constraint firstItem="OHK-u8-TqC" firstAttribute="leading" secondItem="iN0-l3-epB" secondAttribute="leading" id="70K-ia-gkh"/>
                 <constraint firstAttribute="trailing" secondItem="OHK-u8-TqC" secondAttribute="trailing" id="BFG-ti-zO2"/>
-                <constraint firstItem="JVr-DI-6SM" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="8" id="JSr-GM-fsR"/>
+                <constraint firstItem="JVr-DI-6SM" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" priority="999" constant="8" id="JSr-GM-fsR"/>
                 <constraint firstAttribute="bottom" secondItem="JVr-DI-6SM" secondAttribute="bottom" constant="5" id="QPC-rd-Kql"/>
                 <constraint firstAttribute="trailing" secondItem="JVr-DI-6SM" secondAttribute="trailing" constant="15" id="UIo-21-fex"/>
                 <constraint firstAttribute="bottom" secondItem="OHK-u8-TqC" secondAttribute="bottom" id="c0N-1c-nyD"/>
