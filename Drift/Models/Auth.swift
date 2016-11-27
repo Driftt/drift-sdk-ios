@@ -7,31 +7,25 @@
 //
 
 import UIKit
-import Gloss
+import ObjectMapper
 
-struct Auth: Glossy {
+struct Auth: Mappable {
     
-    var accessToken: String
+    var accessToken: String!
     var enduser: User?
-
-    init?(json: JSON) {
-        guard let
-            aToken: String = "accessToken" <~~ json
-            where aToken != ""
-            else {
-                LoggerManager.log("Auth Serialisation Failed")
-                return nil
-        }
+    
+    init?(map: Map) {
+        //These fields are required, without them we fail to init the object
+        accessToken = map["accessToken"].validNotEmpty()
         
-        self.accessToken = aToken
-        self.enduser = "endUser" <~~ json
+        if !map.isValidNotEmpty{
+            LoggerManager.log("Auth Serialisation Failed")
+            return nil
+        }
     }
     
-    func toJSON() -> JSON? {
-        return jsonify([
-            "accessToken" ~~> self.accessToken,
-            "endUser" ~~> self.enduser
-            ])
+    mutating func mapping(map: Map) {
+        accessToken <- map["accessToken"]
+        enduser     <- map["endUser"]
     }
-    
 }

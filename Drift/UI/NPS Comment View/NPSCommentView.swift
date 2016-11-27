@@ -44,14 +44,14 @@ class NPSCommentView: ContainerSubView {
         textView.layer.cornerRadius = 3.0
         textView.tintColor = background
         sendButtonContainer.backgroundColor = foreground.alpha(0.1)
-        sendButton.setTitleColor(foreground, forState: .Normal)
+        sendButton.setTitleColor(foreground, for: UIControlState())
         thankYouLabel.textColor = foreground
         closeButton.tintColor = foreground
         
  
         if background.brightness() < 0.7
         {
-            textView.backgroundColor = UIColor.whiteColor()
+            textView.backgroundColor = UIColor.white
         }
         else
         {
@@ -61,11 +61,11 @@ class NPSCommentView: ContainerSubView {
         
     }
     
-    @IBAction func closePressed(sender: AnyObject) {
-        delegate?.subViewNeedsDismiss(campaign!, response: .NPS(.Numeric(numericResponse)))
+    @IBAction func closePressed(_ sender: AnyObject) {
+        delegate?.subViewNeedsDismiss(campaign!, response: .nps(.numeric(numericResponse)))
     }
     
-    @IBAction func sendPressed(sender: AnyObject) {
+    @IBAction func sendPressed(_ sender: AnyObject) {
         let text = textView.text
         if let npsCompleteView = NPSCompleteView.fromNib() as? NPSCompleteView {
             npsCompleteView.numericResponse = numericResponse

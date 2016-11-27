@@ -11,9 +11,9 @@ class CampaignView: UIView {
     
     weak var delegate: PresentationManagerDelegate?
     
-    func showOnWindow(window: UIWindow) {}
+    func showOnWindow(_ window: UIWindow) {}
     
     func hideFromWindow() {}
     
-    func updateOtherCampaignCount(count: Int){}
+    func updateOtherCampaignCount(_ count: Int){}
 }

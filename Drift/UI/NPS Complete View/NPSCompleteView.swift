@@ -34,25 +34,25 @@ class NPSCompleteView: ContainerSubView {
         
         if numericResponse <= 6 {
             //Detractors
-            imageView.hidden = true
+            imageView.isHidden = true
             imageHeightConstraint.constant = 20
         }else if numericResponse >= 9 {
             //Promoters
-            bottomLabel.hidden = true
+            bottomLabel.isHidden = true
             imageTopConstraint.constant = 60
-            imageView.image = UIImage(named: "veryHappyFace", inBundle: NSBundle(forClass: Drift.self), compatibleWithTraitCollection: nil)
+            imageView.image = UIImage(named: "veryHappyFace", in: Bundle(for: Drift.self), compatibleWith: nil)
         }else{
             //Passive
             imageTopConstraint.constant = 60
-            bottomLabel.hidden = true
-            imageView.image = UIImage(named: "happyFace", inBundle: NSBundle(forClass: Drift.self), compatibleWithTraitCollection: nil)
+            bottomLabel.isHidden = true
+            imageView.image = UIImage(named: "happyFace", in: Bundle(for: Drift.self), compatibleWith: nil)
         }
         
         
         let foreground = DriftDataStore.sharedInstance.generateForegroundColor()
 
         sendButtonContainer.backgroundColor = foreground.alpha(0.1)
-        sendButton.setTitleColor(foreground, forState: .Normal)
+        sendButton.setTitleColor(foreground, for: UIControlState())
         thankYouLabel.textColor = foreground
         bottomLabel.textColor = foreground
         imageView.tintColor = foreground
@@ -60,20 +60,20 @@ class NPSCompleteView: ContainerSubView {
     
     }
     
-    @IBAction func closeButtonPressed(sender: AnyObject) {
+    @IBAction func closeButtonPressed(_ sender: AnyObject) {
         didFinish()
     }
     
-    @IBAction func donePressed(sender: AnyObject) {
+    @IBAction func donePressed(_ sender: AnyObject) {
         didFinish()
     }
     
     func didFinish() {
         
-        var response:CampaignResponse = .NPS(.Numeric(numericResponse))
+        var response: CampaignResponse = .nps(.numeric(numericResponse))
 
         if comment != "" {
-            response = .NPS(.TextAndNumeric(numericResponse, comment))
+            response = .nps(.textAndNumeric(numericResponse, comment))
         }
         
         delegate?.subViewNeedsDismiss(campaign!, response: response)

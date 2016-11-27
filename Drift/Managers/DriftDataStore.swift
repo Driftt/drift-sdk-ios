@@ -7,15 +7,16 @@
 //
 
 import UIKit
+import ObjectMapper
 
 ///Datastore for caching Embed and Auth object between app opens
 class DriftDataStore {
 
-    static let driftAuthCacheString = "DriftAuthDataJSONCache"
-    static let driftEmbedCacheString = "DriftEmbedJSONCache"
+    static let driftAuthCacheString = "DriftSDKAuthDataJSONCache"
+    static let driftEmbedCacheString = "DriftSDKEmbedJSONCache"
     
-    private (set) var auth: Auth?
-    private (set) var embed: Embed?
+    fileprivate (set) var auth: Auth?
+    fileprivate (set) var embed: Embed?
     
     static var sharedInstance: DriftDataStore = {
         let store = DriftDataStore()
@@ -23,12 +24,12 @@ class DriftDataStore {
         return store
     }()
     
-    func setAuth(auth: Auth) {
+    func setAuth(_ auth: Auth) {
         self.auth = auth
         saveData()
     }
     
-    func setEmbed(embed: Embed) {
+    func setEmbed(_ embed: Embed) {
         self.embed = embed
         saveData()
     }
@@ -36,10 +37,10 @@ class DriftDataStore {
     
     func loadData(){
         
-        let userDefs = NSUserDefaults.standardUserDefaults()
+        let userDefs = UserDefaults.standard
         
-        if let data = userDefs.stringForKey(DriftDataStore.driftAuthCacheString), json = convertStringToDictionary(data) {
-            let tempAuth = Auth(json: json)
+        if let data = userDefs.string(forKey: DriftDataStore.driftAuthCacheString), let json = convertStringToDictionary(data) {
+            let tempAuth = Auth(JSON: json)
             if let auth =  tempAuth{
                 self.auth = auth
             }else{
@@ -47,8 +48,9 @@ class DriftDataStore {
             }
         }
         
-        if let data = userDefs.stringForKey(DriftDataStore.driftEmbedCacheString), json = convertStringToDictionary(data) {
-            let tempEmbed = Embed(json: json)
+        if let data = userDefs.string(forKey: DriftDataStore.driftEmbedCacheString), let json = convertStringToDictionary(data) {
+            let tempEmbed = Mapper<Embed>().map(JSON: json)
+            
             if let embed = tempEmbed {
                 self.embed = embed
             }else{
@@ -58,16 +60,16 @@ class DriftDataStore {
     }
     
     func saveData(){
-        let userDefs = NSUserDefaults.standardUserDefaults()
+        let userDefs = UserDefaults.standard
         
-        if let embed = embed, embedJSON = embed.toJSON(), json = convertDictionaryToString(embedJSON) {
-            userDefs.setObject(json, forKey: DriftDataStore.driftEmbedCacheString)
+        if let embed = embed, let json = convertDictionaryToString(embed.toJSON() as [String : AnyObject]) {
+            userDefs.set(json, forKey: DriftDataStore.driftEmbedCacheString)
         }else{
             LoggerManager.log("Failed to save embed")
         }
         
-        if let auth = auth, authJSON = auth.toJSON(), json = convertDictionaryToString(authJSON) {
-            userDefs.setObject(json, forKey: DriftDataStore.driftAuthCacheString)
+        if let auth = auth, let json = convertDictionaryToString( auth.toJSON() as [String : AnyObject]) {
+            userDefs.set(json, forKey: DriftDataStore.driftAuthCacheString)
         }
         
         userDefs.synchronize()
@@ -76,18 +78,20 @@ class DriftDataStore {
     }
     
     func removeData(){
-        let userDefs = NSUserDefaults.standardUserDefaults()
-        userDefs.removeObjectForKey(DriftDataStore.driftAuthCacheString)
+        let userDefs = UserDefaults.standard
+        userDefs.removeObject(forKey: DriftDataStore.driftAuthCacheString)
+        userDefs.removeObject(forKey: DriftDataStore.driftEmbedCacheString)
         userDefs.synchronize()
         auth = nil
+        embed = nil
     }
     
     
     ///Converts string to JSON - Used in loading from cache
-    private func convertStringToDictionary(text: String) -> [String:AnyObject]? {
-        if let data = text.dataUsingEncoding(NSUTF8StringEncoding) {
+    fileprivate func convertStringToDictionary(_ text: String) -> [String:AnyObject]? {
+        if let data = text.data(using: String.Encoding.utf8) {
             do {
-                return try NSJSONSerialization.JSONObjectWithData(data, options: []) as? [String:AnyObject]
+                return try JSONSerialization.jsonObject(with: data, options: []) as? [String:AnyObject]
             } catch let error as NSError {
                 LoggerManager.didRecieveError(error)
             }
@@ -96,13 +100,13 @@ class DriftDataStore {
     }
     
     ///Converst JSON to string for caching in NSUserDefaults
-    private func convertDictionaryToString(json: [String: AnyObject]) -> String? {
+    fileprivate func convertDictionaryToString(_ json: [String: AnyObject]) -> String? {
         
-        if NSJSONSerialization.isValidJSONObject(json) {
+        if JSONSerialization.isValidJSONObject(json) {
         
             do {
-                let jsonData = try NSJSONSerialization.dataWithJSONObject(json, options: .PrettyPrinted)
-                return String(data: jsonData, encoding: NSUTF8StringEncoding)
+                let jsonData = try JSONSerialization.data(withJSONObject: json, options: .prettyPrinted)
+                return String(data: jsonData, encoding: String.Encoding.utf8)
             } catch let error as NSError {
                 LoggerManager.didRecieveError(error)
             }
@@ -126,5 +130,8 @@ extension DriftDataStore{
         }
         return UIColor(red:0.54, green:0.4, blue:1, alpha:1)
     }
+    
+    static let primaryFontColor = UIColor(red:0.20, green:0.20, blue:0.20, alpha:1.00)
+    static let secondaryFontColor = UIColor(red:0.60, green:0.60, blue:0.60, alpha:1.00)
     
 }

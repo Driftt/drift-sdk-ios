@@ -1,8 +1,6 @@
 Drift
 ============
 [![CocoaPods](https://img.shields.io/cocoapods/v/Drift.svg)](https://github.com/Driftt/drift-sdk-ios)
-[![Carthage compatible](https://img.shields.io/badge/Carthage-compatible-4BC51D.svg?style=flat)](https://github.com/Carthage/Carthage)
-
 
 DriftSDK is the official Drift SDK written in Swift enabling you to both send announcements and collect vital NPS responses all within the app!
 
@@ -19,12 +17,6 @@ DriftSDK can be added to your project using CocoaPods by adding the following li
 
 ```ruby
 pod 'Drift', '~> 0.0.1'
-```
-
-For Carthage you can add a dependency on DriftSDK by adding it to your `Cartfile`:
-
-```
-github "Driftt/drift-sdk-ios" ~> 0.0.1
 ```
 
 ## Registering

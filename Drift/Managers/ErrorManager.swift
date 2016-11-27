@@ -7,24 +7,25 @@
 //
 
 
-enum DriftError: ErrorType {
-    case APIFailure
-    case AuthFailure
-    case EmbedFailure
+enum DriftError: Error {
+    case apiFailure
+    case authFailure
+    case embedFailure
+    case dataCreationFailure
 }
 
 
 class LoggerManager {
     
-    class func didRecieveError(error: ErrorType) {
+    class func didRecieveError(_ error: Error) {
         if DriftManager.sharedInstance.debug {
             print(error)
         }
     }
     
-    class func log(text: String) {
+    class func log(_ text: String) {
         if DriftManager.sharedInstance.debug {
-            print(text)
+            print("🚀🚀\(text)🚀🚀")
         }
     }
 }

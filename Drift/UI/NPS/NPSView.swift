@@ -52,7 +52,7 @@ class NPSView: ContainerSubView {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        userInteractionEnabled = true
+        isUserInteractionEnabled = true
         buttons.append(button0)
         buttons.append(button1)
         buttons.append(button2)
@@ -68,10 +68,10 @@ class NPSView: ContainerSubView {
         let foreground = DriftDataStore.sharedInstance.generateForegroundColor()
         
         for button in buttons {
-            button.addTarget(self, action: #selector(NPSView.didSelectButton(_:)), forControlEvents: .TouchUpInside)
-            button.hidden = true
+            button.addTarget(self, action: #selector(NPSView.didSelectButton(_:)), for: .touchUpInside)
+            button.isHidden = true
             button.titleColor = foreground
-            button.backgroundColor = UIColor.clearColor()
+            button.backgroundColor = UIColor.clear
             button.borderColor = foreground
         }
         
@@ -84,33 +84,33 @@ class NPSView: ContainerSubView {
         animateButtonsIn()
     }
     
-    private func animateButtonsIn(){
+    fileprivate func animateButtonsIn(){
     
-        for (i, button) in buttons.enumerate() {
-            button.transform = CGAffineTransformMakeScale(0, 0)
-            button.hidden = false
+        for (i, button) in buttons.enumerated() {
+            button.transform = CGAffineTransform(scaleX: 0, y: 0)
+            button.isHidden = false
             let delay: Double = 0.05 * Double(i)
-            UIView.animateWithDuration(0.2, delay: delay, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: UIViewAnimationOptions.CurveEaseOut, animations: { () -> Void in
-                button.transform = CGAffineTransformMakeScale(1, 1)
+            UIView.animate(withDuration: 0.2, delay: delay, usingSpringWithDamping: 0.5, initialSpringVelocity: 0, options: UIViewAnimationOptions.curveEaseOut, animations: { () -> Void in
+                button.transform = CGAffineTransform(scaleX: 1, y: 1)
             }, completion: nil)
         }
     }
     
-    func didSelectButton(sender: NPSButton){
+    func didSelectButton(_ sender: NPSButton){
         
-        let index = buttons.indexOf(sender) ?? 0
+        let index = buttons.index(of: sender) ?? 0
         
         let background = DriftDataStore.sharedInstance.generateBackgroundColor()
         let foreground = DriftDataStore.sharedInstance.generateForegroundColor()
-        for (i, button) in buttons.enumerate() {
+        for (i, button) in buttons.enumerated() {
         
             if i <= index {
                 button.titleColor = background
                 button.backgroundColor = foreground
-                button.borderColor = UIColor.clearColor()
+                button.borderColor = UIColor.clear
             }else{
                 button.titleColor = foreground
-                button.backgroundColor = UIColor.clearColor()
+                button.backgroundColor = UIColor.clear
                 button.borderColor = foreground
             }
         }
@@ -122,8 +122,8 @@ class NPSView: ContainerSubView {
         
     }
     
-    @IBAction func closePressed(sender: AnyObject) {
-        delegate?.subViewNeedsDismiss(campaign!, response: .NPS(.Dismissed))
+    @IBAction func closePressed(_ sender: AnyObject) {
+        delegate?.subViewNeedsDismiss(campaign!, response: .nps(.dismissed))
     }
     
 }

@@ -14,14 +14,14 @@ class LayerManager: NSObject, LYRClientDelegate {
     
     static var sharedInstance: LayerManager = LayerManager()
     var layerClient: LYRClient?
-    var userId: Int!
+    var userId: Int = -1
     
     ///Completion block passed along auth functions
-    var completion: ((success: Bool) -> ())?
+    var completion: ((_ success: Bool) -> ())?
     //Refresh timer - ensures all syncing is complete before calling presentation Manager - Allows campaigns to stack
-    private var synchronizationTimer: NSTimer?
+    fileprivate var synchronizationTimer: Timer?
     
-    private override init() {
+    fileprivate override init() {
         super.init()
     }
     
@@ -29,9 +29,13 @@ class LayerManager: NSObject, LYRClientDelegate {
         synchronizationTimer?.invalidate()
     }
     
-    class func initialize(appId: String, userId: Int, completion: (success: Bool) -> ()) {
+    class func initialize(_ appId: String, userId: Int, completion: @escaping (_ success: Bool) -> ()) {
         
         if sharedInstance.layerClient != nil {
+            
+            if (sharedInstance.layerClient!.isConnecting){
+                return
+            }
             
             sharedInstance.userId = userId
             sharedInstance.completion = completion
@@ -39,14 +43,14 @@ class LayerManager: NSObject, LYRClientDelegate {
             return
         }
         
-        let url = NSURL(string: "layer:///apps/staging/\(appId)")!
+        let url = URL(string: "layer:///apps/staging/\(appId)")!
 
         sharedInstance.layerClient = LYRClient(appID: url, delegate: sharedInstance, options: nil)
         sharedInstance.userId = userId
         sharedInstance.completion = completion
-        if let connected = sharedInstance.layerClient?.isConnected where connected {
+        if let connected = sharedInstance.layerClient?.isConnected , connected {
             LoggerManager.log("Layer Logged in - Deauthing")
-            sharedInstance.layerClient?.deauthenticateWithCompletion({ (success, error) -> Void in
+            sharedInstance.layerClient?.deauthenticate(completion: { (success, error) -> Void in
                 if success {
                     LoggerManager.log("Layer Deauth success")
                     sharedInstance.startLayerConection()
@@ -62,12 +66,12 @@ class LayerManager: NSObject, LYRClientDelegate {
     }
     
     class func logout(){
-        sharedInstance.layerClient?.deauthenticateWithCompletion({ (success, error) -> Void in})
+        sharedInstance.layerClient?.deauthenticate(completion: { (success, error) -> Void in})
     }
     
     func startLayerConection(){
         LoggerManager.log("Layer Starting connection")
-        layerClient?.connectWithCompletion({ (success, error) -> Void in
+        layerClient?.connect(completion: { (success, error) -> Void in
             if success {
                 LoggerManager.log("Connected to Layer")
                 self.getNonceFromLayer()
@@ -78,41 +82,41 @@ class LayerManager: NSObject, LYRClientDelegate {
     }
     
     func getNonceFromLayer(){
-        layerClient?.requestAuthenticationNonceWithCompletion({ (nonce, error) -> Void in
+        layerClient?.requestAuthenticationNonce(completion: { (nonce, error) -> Void in
             if let nonce = nonce {
                 self.getToken(nonce)
             }else{
-                if error?.code == .Some(7005) {
-                    self.completion?(success: true)
+                if let nsError = error as? NSError, nsError.code == .some(7005) {
+                    self.completion?(true)
                 }else{
                     LoggerManager.log("Failed to get nonce: \(error)")
-                    self.completion?(success: false)
+                    self.completion?(false)
                 }
                 self.completion = nil
             }
         })
     }
     
-    func getToken(nonce: String) {
+    func getToken(_ nonce: String) {
         
         APIManager.getLayerAccessToken(nonce, userId: "u:\(userId)") { (result) -> () in
             switch result {
-            case .Success(let token):
+            case .success(let token):
                 self.authWithLayer(token)
-            case .Failure(let error):
+            case .failure(let error):
                 LoggerManager.log("Failed to get nonce: \(error)")
-                self.completion?(success: false)
+                self.completion?(false)
                 self.completion = nil
             }
         }
     }
     
-    func authWithLayer(token: String) {
-        layerClient?.authenticateWithIdentityToken(token, completion: { (authUserId, error) -> Void in
+    func authWithLayer(_ token: String) {
+        layerClient?.authenticate(withIdentityToken: token, completion: { (authUserId, error) -> Void in
             
             if let authUserId = authUserId {
                 LoggerManager.log("Authed with Layer: \(authUserId)")
-                self.completion?(success: true)
+                self.completion?(true)
                 self.completion = nil
             }else{
                 if let error = error {
@@ -126,24 +130,24 @@ class LayerManager: NSObject, LYRClientDelegate {
     ///Layer Client
     
     
-    func layerClient(client: LYRClient, didReceiveAuthenticationChallengeWithNonce nonce: String) {
+    func layerClient(_ client: LYRClient, didReceiveAuthenticationChallengeWithNonce nonce: String) {
         LoggerManager.log("Auth Challenge with Nonce")
         getToken(nonce)
     }
     
-    func layerClientDidConnect(client: LYRClient) {
+    func layerClientDidConnect(_ client: LYRClient) {
         LoggerManager.log("Did connect")
     }
     
     ///Make sure we have all changes before we pass off to campaigns manager
-    func layerClient(client: LYRClient, objectsDidChange changes: [LYRObjectChange]) {
+    func layerClient(_ client: LYRClient, objectsDidChange changes: [LYRObjectChange]) {
         synchronizationTimer?.invalidate()
-        synchronizationTimer = NSTimer.scheduledTimerWithTimeInterval(2.0, target: self, selector: #selector(LayerManager.didFinishSync), userInfo: nil, repeats: false)
+        synchronizationTimer = Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(LayerManager.didFinishSync), userInfo: nil, repeats: false)
     }
     
-    func layerClient(client: LYRClient, didFinishSynchronizationWithChanges changes: [LYRObjectChange]) {        
+    func layerClient(_ client: LYRClient, didFinishSynchronizationWithChanges changes: [LYRObjectChange]) {        
         synchronizationTimer?.invalidate()
-        synchronizationTimer = NSTimer.scheduledTimerWithTimeInterval(2.0, target: self, selector: #selector(LayerManager.didFinishSync), userInfo: nil, repeats: false)
+        synchronizationTimer = Timer.scheduledTimer(timeInterval: 2.0, target: self, selector: #selector(LayerManager.didFinishSync), userInfo: nil, repeats: false)
     }
     
     
@@ -156,7 +160,9 @@ class LayerManager: NSObject, LYRClientDelegate {
         
     }
     
-    func layerClient(client: LYRClient, didFailSynchronizationWithError error: NSError) {
+    
+    func layerClient(_ client: LYRClient, didFailOperationWithError error: Error) {
         LoggerManager.log("Sync Failed: \(error.localizedDescription)")
     }
+
 }

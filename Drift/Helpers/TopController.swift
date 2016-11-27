@@ -16,9 +16,9 @@ class TopController {
      - returns: UIViewController being presented to the user or nil
 
      */
-    class func viewController(startController: UIViewController? = nil) -> UIViewController?{
+    class func viewController(_ startController: UIViewController? = nil) -> UIViewController?{
         
-        var topController = startController ?? UIApplication.sharedApplication().keyWindow?.rootViewController
+        var topController = startController ?? UIApplication.shared.keyWindow?.rootViewController
         
         if topController != nil {
             while topController!.presentedViewController != nil {
@@ -26,10 +26,12 @@ class TopController {
             }
         }
         
-        if let navController = topController as? UINavigationController, top = navController.topViewController {
+        if let navController = topController as? UINavigationController, let top = navController.topViewController {
             return viewController(top)
-        }else if let tabController = topController as? UITabBarController, current = tabController.selectedViewController {
+        }else if let tabController = topController as? UITabBarController, let current = tabController.selectedViewController {
             return viewController(current)
+        }else if let presented = topController as? UIAlertController {
+            return presented.presentingViewController
         }
         
         return topController
@@ -42,7 +44,7 @@ class TopController {
      */
     class func hasTabBar() -> Bool{
         
-        if let controller = viewController(), _ = controller.tabBarController {
+        if let controller = viewController(), let _ = controller.tabBarController {
             return true
         }
         return false

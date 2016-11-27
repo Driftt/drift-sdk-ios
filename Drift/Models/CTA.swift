@@ -6,8 +6,8 @@
 //  Copyright © 2016 Drift. All rights reserved.
 //
 
-import Gloss
-class CTA: Decodable {
+import ObjectMapper
+class CTA: Mappable {
     
     /**
       Types of CTA the SDK can Parse
@@ -21,12 +21,15 @@ class CTA: Decodable {
     
     var copy: String?
     var ctaType: CTAType?
-    var urlLink: NSURL?
+    var urlLink: URL?
 
-    required init?(json: JSON) {
-        copy = "copy" <~~ json
-        ctaType = "CtaType" <~~ json
-        urlLink = "UrlLink" <~~ json
+    required convenience init?(map: Map) {
+        self.init()
     }
-
+    
+    func mapping(map: Map) {
+        copy        <- map["copy"]
+        ctaType     <- map["CtaType"]
+        urlLink     <- map["UrlLink"]
+    }
 }

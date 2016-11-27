@@ -9,7 +9,7 @@
   },
   "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "E197FD8C-22BE-4095-A9C1-4E2427E4C6A6",
   "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
-    "ED041FF57A3EA72DE7199DE1726AB0BE8A3150EB" : "DriftSDKRelease\/",
+    "ED041FF57A3EA72DE7199DE1726AB0BE8A3150EB" : "drift-sdk-ios\/",
     "0172658E0AB690536375C4C9E4DFFA5A2CD459D4" : "DriftSDKRelease\/Carthage\/Checkouts\/releases-ios\/"
   },
   "DVTSourceControlWorkspaceBlueprintNameKey" : "Drift",

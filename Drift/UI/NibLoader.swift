@@ -15,20 +15,20 @@ extension UIView {
      - parameter nibNameOrNil: - NibName or nil - If nil the Class name of self is used instead
      - returns: Instance of the class or nil
      */
-    class func fromNib<T : UIView>(nibNameOrNil: String? = nil) -> T? {
+    class func fromNib<T : UIView>(_ nibNameOrNil: String? = nil) -> T? {
         var view: T?
         let name: String
         if let nibName = nibNameOrNil {
             name = nibName
         } else {
             // Most nibs are demangled by practice, if not, just declare string explicitly
-            name = "\(self)".componentsSeparatedByString(".").last!
+            name = "\(self)".components(separatedBy: ".").last!
         }
         
-        let bundle = NSBundle(forClass: self)
+        let bundle = Bundle(for: self)
 
         let nib = UINib(nibName: name, bundle: bundle)
-        view = nib.instantiateWithOwner(self, options: nil)[0] as? T
+        view = nib.instantiate(withOwner: self, options: nil)[0] as? T
         
         return view
     }

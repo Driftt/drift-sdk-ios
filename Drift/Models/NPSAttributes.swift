@@ -6,17 +6,21 @@
 //  Copyright © 2016 Drift. All rights reserved.
 //
 
-import Gloss
+import ObjectMapper
 ///Attributes used for NPS
-class NPSAttributes: Decodable {
+class NPSAttributes: Mappable {
     
     var cta: CTA?
     var followUpQuestion: String?
     var campaignId: Int?
     
-    required init?(json: JSON) {
-        cta = "cta" <~~ json
-        followUpQuestion = "followUpMessage" <~~ json
-        campaignId = "campaignId" <~~ json
+    required convenience init?(map: Map) {
+        self.init()
+    }
+    
+    func mapping(map: Map) {
+        cta                 <- map["cta"]
+        followUpQuestion    <- map["followUpMessage"]
+        campaignId          <- map["campaignId"]
     }
 }

@@ -11,19 +11,19 @@ import UIKit
 class NPSButton: UIButton {
 
     @IBInspectable var lineWidth: CGFloat = 1
-    @IBInspectable var borderColor: UIColor = UIColor.whiteColor(){
+    @IBInspectable var borderColor: UIColor = UIColor.white{
         didSet{
             setupView()
         }
     }
     
-    @IBInspectable var buttonColor: UIColor = UIColor.clearColor(){
+    @IBInspectable var buttonColor: UIColor = UIColor.clear{
         didSet{
             setupView()
         }
     }
     
-    @IBInspectable var titleColor: UIColor = UIColor.whiteColor(){
+    @IBInspectable var titleColor: UIColor = UIColor.white{
         didSet{
             setupView()
         }
@@ -35,9 +35,9 @@ class NPSButton: UIButton {
         }
     }
     
-    private func setupView(){
+    fileprivate func setupView(){
         backgroundColor = buttonColor
-        layer.borderColor = borderColor.CGColor
+        layer.borderColor = borderColor.cgColor
         if cornerRadius == 0{
             layer.cornerRadius = self.frame.size.height/2
         }else{
@@ -47,7 +47,7 @@ class NPSButton: UIButton {
         layer.borderWidth = CGFloat(lineWidth)
         clipsToBounds = true
         
-        setTitleColor(titleColor, forState: .Normal)
+        setTitleColor(titleColor, for: UIControlState())
     }
 
     override func prepareForInterfaceBuilder() {

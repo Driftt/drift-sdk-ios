@@ -8,6 +8,7 @@
 
 import Foundation
 import LayerKit
+import ObjectMapper
 
 class CampaignsManager {
     /**
@@ -15,27 +16,53 @@ class CampaignsManager {
         Calls Presentation Manager to present any Campaigns to be shown
      */
     class func checkForCampaigns() throws{
-        
+        LoggerManager.log("Checking for campaigns")
         do {
             let convo = LYRQuery(queryableClass: LYRConversation.self)
-            convo.predicate = LYRPredicate(property: "hasUnreadMessages", predicateOperator: LYRPredicateOperator.IsEqualTo, value: true)
-            let conversationController = try LayerManager.sharedInstance.layerClient?.queryControllerWithQuery(convo)
+            convo.predicate = LYRPredicate(property: "hasUnreadMessages", predicateOperator: LYRPredicateOperator.isEqualTo, value: true)
+            let conversationController = try LayerManager.sharedInstance.layerClient?.queryController(with: convo)
             try conversationController?.execute()
-            var announcments:[Campaign] = []
-            if let countUInt = conversationController?.numberOfObjectsInSection(0) {
+            var announcements:[Campaign] = []
+            var messages:[(conversationId: Int, messages:[Message])] = []
+            if let countUInt = conversationController?.numberOfObjects(inSection: 0) {
                 let count = Int(countUInt)
                 for index: Int in 0..<count {
-                    if let conversation = conversationController?.objectAtIndexPath(NSIndexPath(forRow: index, inSection: 0)) as? LYRConversation {
+                    if let conversation = conversationController?.object(at: IndexPath(row: index, section: 0)) as? LYRConversation {
                         LoggerManager.log("Conversation hasunread: \(conversation.hasUnreadMessages)")
                         LoggerManager.log("Conversation Id: \(conversation.identifier)")
-                        let newAnnouncments = try getMessages(conversation)
-                        announcments = announcments + newAnnouncments
+                        let newData = try getCampaignsAndMessagesFor(conversation)
+                        announcements = announcements + newData.announcments
+                        if !newData.messages.isEmpty {
+                            messages.append((conversationId: newData.messages.first!.conversationId, messages: newData.messages))
+                        }
                     }
                 }
             }
             
-            let filtered = filtercampaigns(announcments)
-            PresentationManager.sharedInstance.didRecieveCampaigns(filtered.nps + filtered.announcments)
+            var messagesToShow:[(conversationId: Int, messages:[Message])] = []
+            var messagesSyncedToVC = false
+            for messageTouple in messages {
+                if InboxManager.sharedInstance.hasSubscriptionForConversationId(messageTouple.conversationId) {
+                    for message in messageTouple.messages {
+                        InboxManager.sharedInstance.messageDidUpdate(message)
+                    }
+                    messagesSyncedToVC = true
+                }else {
+                    //Tell presentation controller we have new messages?
+                    messagesToShow.append((conversationId: messageTouple.conversationId, messages: messageTouple.messages))
+                }
+            }
+            
+            if !messagesSyncedToVC {
+                if messagesToShow.isEmpty {
+                    let filtered = filtercampaigns(announcements)
+                    PresentationManager.sharedInstance.didRecieveCampaigns(filtered.nps + filtered.announcements)
+                }else{
+                    PresentationManager.sharedInstance.didRecieveNewMessages(messagesToShow)
+                }
+            }
+            
+            
         } catch {
             LoggerManager.log("Error in checking conversations")
         }
@@ -50,29 +77,34 @@ class CampaignsManager {
         - parameter conversation: Layer Conversation to traverse for campaigns
         - returns: All campaigns in a conversation - These are not SDK dependant - Should be parsed later for non presentable campaigns
      */
-    class func getMessages(conversation: LYRConversation) throws -> [Campaign] {
+    class func getCampaignsAndMessagesFor(_ conversation: LYRConversation) throws -> (announcments: [Campaign], messages: [Message]) {
                 
         let messagesQuery:LYRQuery = LYRQuery(queryableClass: LYRMessage.self)
-        messagesQuery.predicate = LYRPredicate(property: "conversation", predicateOperator: LYRPredicateOperator.IsEqualTo, value: conversation)
+        messagesQuery.predicate = LYRPredicate(property: "conversation", predicateOperator: LYRPredicateOperator.isEqualTo, value: conversation)
         messagesQuery.sortDescriptors = [NSSortDescriptor(key:"position", ascending:true)]
-        let queryController = try LayerManager.sharedInstance.layerClient?.queryControllerWithQuery(messagesQuery)
+        let queryController = try LayerManager.sharedInstance.layerClient?.queryController(with: messagesQuery)
         try queryController?.execute()
         
-        var announcments:[Campaign] = []
-        if let countUInt = queryController?.numberOfObjectsInSection(0) {
+        var announcements:[Campaign] = []
+        var messages:[Message] = []
+
+        if let countUInt = queryController?.numberOfObjects(inSection: 0) {
+            LoggerManager.log("Number Of Messages: \(countUInt)")
             let count = Int(countUInt)
             for index: Int in 0..<count {
-                if let message = queryController?.objectAtIndexPath(NSIndexPath(forRow: index, inSection: 0)) as? LYRMessage {
-                    
+                if let message = queryController?.object(at: IndexPath(row: index, section: 0)) as? LYRMessage , message.isUnread {
                     
                     for part in message.parts {
-                        switch part.MIMEType {
+                        switch part.mimeType {
 //                        case "text/plain":
                         case "application/json":
-                            
-                            if let data = part.data, json = try NSJSONSerialization.JSONObjectWithData(data, options: .AllowFragments) as? [String: AnyObject] {
-                                if let newAnnouncment = Campaign(json: json) where newAnnouncment.messageType != nil{
-                                    announcments.append(newAnnouncment)
+                            LoggerManager.log("Mapping Mime Type")
+
+                            if let data = part.data, let json = try JSONSerialization.jsonObject(with: data, options: .allowFragments) as? [String: AnyObject] {
+                                if let newAnnouncement = Mapper<Campaign>().map(JSON: json) {
+                                    announcements.append(newAnnouncement)
+                                }else if let newMessage = Mapper<Message>().map(JSON: json) {
+                                    messages.append(newMessage)
                                 }
                             }
                             
@@ -83,43 +115,43 @@ class CampaignsManager {
                 }
             }
         }
-        return announcments
+        return (announcements, messages)
     }
     
     /**
-        This is responsible for filtering an array of campaigns into NPS and Announcments
+        This is responsible for filtering an array of campaigns into NPS and Announcements
         This will also filter out non presentable campaigns
         - parameter campaign: Array of non filtered campaigns
-        - returns: Tuple of NPS and Announcment Type Campaigns that are presentable in SDK
+        - returns: Tuple of NPS and Announcement Type Campaigns that are presentable in SDK
     */
-    class func filtercampaigns(campaigns: [Campaign]) -> (nps: [Campaign], announcments: [Campaign]){
+    class func filtercampaigns(_ campaigns: [Campaign]) -> (nps: [Campaign], announcements: [Campaign]){
         
         ///GET NPS or NPS_RESPONSE
         
-        ///DO Priority - Announcements before NPS Latest first
+        ///DO Priority - Announcements before NPS, Latest first
         
         var npsResponse: [Campaign] = []
         var nps: [Campaign] = []
-        var announcments: [Campaign] = []
+        var announcements: [Campaign] = []
         
         for campaign in campaigns {
             
             switch campaign.messageType {
                 
-            case .Some(.NPS):
+            case .some(.NPS):
                 nps.append(campaign)
-            case .Some(.NPSResponse):
+            case .some(.NPSResponse):
                 npsResponse.append(campaign)
-            case .Some(.Announcement):
-                //Only show chat response announcments if we have an email
-                if let ctaType = campaign.announcmentAttributes?.cta?.ctaType where ctaType == .ChatResponse{
-                    if let email = DriftDataStore.sharedInstance.embed?.inboxEmailAddress where email != ""{
-                        announcments.append(campaign)
+            case .some(.Announcement):
+                //Only show chat response announcements if we have an email
+                if let ctaType = campaign.announcementAttributes?.cta?.ctaType , ctaType == .ChatResponse{
+                    if let email = DriftDataStore.sharedInstance.embed?.inboxEmailAddress , email != ""{
+                        announcements.append(campaign)
                     }else{
-                        LoggerManager.log("Did remove chat announcment as we dont have an email")
+                        LoggerManager.log("Did remove chat announcement as we dont have an email")
                     }
                 }else{
-                    announcments.append(campaign)
+                    announcements.append(campaign)
                 }
             default:
                 ()
@@ -136,7 +168,7 @@ class CampaignsManager {
             return false
         }
         
-        return (nps, announcments)
+        return (nps, announcements)
     }
     
     
@@ -145,21 +177,21 @@ class CampaignsManager {
     
      - parameter messageId:
      */
-    class func markConversationAsRead(messageId: String) {
-        guard let messageId = NSURL(string: "layer:///messages/\(messageId)") else{
+    class func markConversationAsRead(_ messageId: String) {
+        guard let messageId = URL(string: "layer:///messages/\(messageId)") else{
             return
         }
         
         do {
             let messagesQuery:LYRQuery = LYRQuery(queryableClass: LYRMessage.self)
 
-            messagesQuery.predicate = LYRPredicate(property: "identifier", predicateOperator: LYRPredicateOperator.IsEqualTo, value: messageId)
-            let queryController = try LayerManager.sharedInstance.layerClient?.queryControllerWithQuery(messagesQuery)
+            messagesQuery.predicate = LYRPredicate(property: "identifier", predicateOperator: LYRPredicateOperator.isEqualTo, value: messageId)
+            let queryController = try LayerManager.sharedInstance.layerClient?.queryController(with: messagesQuery)
             try queryController?.execute()
-            if let countUInt = queryController?.numberOfObjectsInSection(0) {
+            if let countUInt = queryController?.numberOfObjects(inSection: 0) {
                 let count = Int(countUInt)
                 for index: Int in 0..<count {
-                    if let message = queryController?.objectAtIndexPath(NSIndexPath(forRow: index, inSection: 0)) as? LYRMessage {
+                    if let message = queryController?.object(at: IndexPath(row: index, section: 0)) as? LYRMessage {
                         LoggerManager.log("Marking as Read: \(messageId)")
                         try message.markAsRead()
                     }

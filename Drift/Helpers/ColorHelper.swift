@@ -15,9 +15,9 @@ extension UIColor {
         - Parameter hexString: Hex Value in string formatat with # removed
      */
     convenience init(hexString: String) {
-        let hex = hexString.stringByTrimmingCharactersInSet(NSCharacterSet.alphanumericCharacterSet().invertedSet)
+        let hex = hexString.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         var int = UInt32()
-        NSScanner(string: hex).scanHexInt(&int)
+        Scanner(string: hex).scanHexInt32(&int)
         let a, r, g, b: UInt32
         switch hex.characters.count {
         case 3: // RGB (12-bit)
@@ -35,8 +35,8 @@ extension UIColor {
      - parameter alpha: The Alpha value to be applied to self
      - returns: self with a different alpha
      */
-    func alpha(alpha: CGFloat) -> UIColor{
-        return self.colorWithAlphaComponent(alpha)
+    func alpha(_ alpha: CGFloat) -> UIColor{
+        return self.withAlphaComponent(alpha)
     }
     
     /**
@@ -47,11 +47,11 @@ extension UIColor {
     func brightnessColor() -> UIColor{
         if brightness() < 0.7
         {
-            return UIColor.whiteColor()
+            return UIColor.white
         }
         else
         {
-            return UIColor.blackColor()
+            return UIColor.black
         }
     }
     /**
@@ -60,11 +60,11 @@ extension UIColor {
      - returns: value between 0 and 1 indicating brightness
      */
     func brightness() -> CGFloat{
-        let components = CGColorGetComponents(self.CGColor)
-        let red = components[0]
-        let green = components[1]
-        let blue = components[2]
-        return ((red * 299) + (green * 587) + (blue * 114)) / 1000
+        let components = self.cgColor.components
+        let red = components?[0]
+        let green = components?[1]
+        let blue = components?[2]
+        return ((red! * 299) + (green! * 587) + (blue! * 114)) / 1000
     }
     
 }
