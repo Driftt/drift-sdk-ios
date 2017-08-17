@@ -38,7 +38,7 @@ class DriftManager: NSObject {
     }
     
     ///Call Embeds API if needed
-    class func retrieveDataFromEmbeds(_ embedId: String) {
+    class func retrieveDataFromEmbeds(_ embedId: String, completion: ((Bool)->())? = nil) {
         if let pastEmbedId = DriftDataStore.sharedInstance.embed?.embedId {
             //New Embed Account - Logout and continue to get new data
             if pastEmbedId != embedId {
@@ -49,7 +49,13 @@ class DriftManager: NSObject {
         getEmbedData(embedId) { (success) in
             //If we have pending register data go in register flow - If register called before embeds is complete
             if let registerInfo = DriftManager.sharedInstance.registerInfo , success {
-                DriftManager.registerUser(registerInfo.userId, email: registerInfo.email, attrs: registerInfo.attrs)
+                DriftManager.registerUser(registerInfo.userId, email: registerInfo.email, attrs: registerInfo.attrs, completion: { userId in
+                    if userId != nil{
+                        completion?(success)
+                        return
+                    }
+                    completion?(false)
+                })
             }
         }
     }
@@ -61,7 +67,10 @@ class DriftManager: NSObject {
     /**
      Gets Auth for user - Calls Identify if new user
     */
-    class func registerUser(_ userId: String, email: String, attrs: [String: AnyObject]? = nil){
+    class func registerUser(_ userId: String, email: String, attrs: [String: AnyObject]? = nil, completion: ((Int?)->())? = nil){
+        DriftDataStore.sharedInstance.setUserId(userId)
+        DriftDataStore.sharedInstance.setEmail(email)
+        
         guard let orgId = DriftDataStore.sharedInstance.embed?.orgId else {
             LoggerManager.log("No Embed, not registering user - Waiting for Embeds to complete")
             DriftManager.sharedInstance.registerInfo = (userId, email, attrs)
@@ -78,6 +87,7 @@ class DriftManager: NSObject {
                     if let userId = auth.enduser?.userId {
                         ConversationsManager.checkForConversations(userId: userId)
                         CampaignsManager.checkForCampaigns(userId: userId)
+                        completion?(userId)
                     }
                 }
             }
@@ -127,7 +137,12 @@ class DriftManager: NSObject {
                 CampaignsManager.checkForCampaigns(userId: userId)
             }
         }else{
-            LoggerManager.log("No End user to post identify for")
+            if let embedId = DriftDataStore.sharedInstance.embed?.embedId, let userId = DriftDataStore.sharedInstance.userId, let userEmail = DriftDataStore.sharedInstance.userEmail {
+                Drift.setup(embedId)
+                Drift.registerUser(userId, email: userEmail)
+            }else{
+                LoggerManager.log("No End user to post identify for")
+            }
         }
         
         if let pastEmbedId = DriftDataStore.sharedInstance.embed?.embedId {
@@ -157,7 +172,8 @@ class DriftManager: NSObject {
         if let endUserId = DriftDataStore.sharedInstance.auth?.enduser?.userId{
             PresentationManager.sharedInstance.showConversationList(endUserId: endUserId)
         }else{
-            LoggerManager.log("No Auth, unable to show conversations for user")
+            PresentationManager.sharedInstance.showConversationList(endUserId: nil)
+            LoggerManager.log("No Auth, will present conversations vc authless")
         }
     }
     

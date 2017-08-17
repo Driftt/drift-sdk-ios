@@ -4,13 +4,13 @@ PODS:
     - Alamofire (~> 4.1)
   - Birdsong (0.5.2):
     - Starscream (= 2.0.1)
-  - Drift (1.0.1):
+  - Drift (1.1.0):
     - AlamofireImage (~> 3.0)
     - Birdsong (~> 0.5)
     - ObjectMapper (~> 2.0)
     - SlackTextViewController (~> 1.9.3)
     - SVProgressHUD (~> 2.0)
-  - ObjectMapper (2.2.7)
+  - ObjectMapper (2.2.8)
   - SlackTextViewController (1.9.5)
   - Starscream (2.0.1)
   - SVProgressHUD (2.1.2)
@@ -26,8 +26,8 @@ SPEC CHECKSUMS:
   Alamofire: f28cdffd29de33a7bfa022cbd63ae95a27fae140
   AlamofireImage: 157ed682cc81d3b9db4fb90c1f12180ac552d93b
   Birdsong: 9ba3983693609813270fbb4aee5484abddc1ea30
-  Drift: 34dfd14d100198eb4ceac3bcdab5c6693ff1ad28
-  ObjectMapper: 65abcfd9a61cf7396cbd14a4fb22fddfcc46577e
+  Drift: e52fbc74b290610df22e127eebfb128426e25c6f
+  ObjectMapper: 3d571bb5af471c779e1160828cd9ad5c4ef90958
   SlackTextViewController: fbcdadbb8090673f604484ff5b6eb8d77baed42a
   Starscream: ce7a202d95615bd4113bc5a0f1932f1db8c808a4
   SVProgressHUD: c404a55d78acbeb7ebb78b76d3faf986475a6994

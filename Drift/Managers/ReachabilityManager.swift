@@ -17,9 +17,9 @@ public extension Notification.Name {
 
 class ReachabilityManager {
     static var sharedInstance: ReachabilityManager = ReachabilityManager()
-    let networkReachabilityManager = Alamofire.NetworkReachabilityManager()
+    let networkReachabilityManager = Alamofire.NetworkReachabilityManager(host: "www.apple.com")
     
-    func start() {
+    func start() {        
         networkReachabilityManager?.listener = { status in
             
             switch status {

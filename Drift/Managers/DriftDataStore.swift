@@ -14,9 +14,13 @@ class DriftDataStore {
 
     static let driftAuthCacheString = "DriftSDKAuthDataJSONCache"
     static let driftEmbedCacheString = "DriftSDKEmbedJSONCache"
-    
+    static let driftUserIdCacheString = "DriftSDKUserIdCache"
+    static let driftUserEmailCacheString = "DriftSDKUserEmailCache"
+
     fileprivate (set) var auth: Auth?
     fileprivate (set) var embed: Embed?
+    fileprivate (set) var userId: String?
+    fileprivate (set) var userEmail: String?
     
     static var sharedInstance: DriftDataStore = {
         let store = DriftDataStore()
@@ -33,7 +37,16 @@ class DriftDataStore {
         self.embed = embed
         saveData()
     }
+    
+    func setUserId(_ userId: String) {
+        self.userId = userId
+        saveData()
+    }
 
+    func setEmail(_ email: String) {
+        self.userEmail = email
+        saveData()
+    }
     
     func loadData(){
         let userDefs = UserDefaults.standard
@@ -56,6 +69,14 @@ class DriftDataStore {
                 LoggerManager.log("Failed to load embed")
             }
         }
+        
+        if let userId = userDefs.string(forKey: DriftDataStore.driftUserIdCacheString) {
+            self.userId = userId
+        }
+        
+        if let userEmail = userDefs.string(forKey: DriftDataStore.driftUserEmailCacheString) {
+            self.userEmail = userEmail
+        }
     }
     
     func saveData(){
@@ -71,6 +92,14 @@ class DriftDataStore {
             userDefs.set(json, forKey: DriftDataStore.driftAuthCacheString)
         }
         
+        if let userId = userId {
+            userDefs.set(userId, forKey: DriftDataStore.driftUserIdCacheString)
+        }
+        
+        if let userEmail = userEmail {
+            userDefs.set(userEmail, forKey: DriftDataStore.driftUserEmailCacheString)
+        }
+        
         userDefs.synchronize()
         
         DriftDataStore.sharedInstance = self
@@ -83,6 +112,8 @@ class DriftDataStore {
         userDefs.synchronize()
         auth = nil
         embed = nil
+        userId = nil
+        userEmail = nil
     }
     
     

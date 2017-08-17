@@ -22,9 +22,9 @@ class ConversationListViewController: UIViewController {
     var dateFormatter = DriftDateFormatter()
     var refreshControl: UIRefreshControl!
     
-    var endUserId: Int!
+    var endUserId: Int?
     
-    class func navigationController(endUserId: Int) -> UINavigationController {
+    class func navigationController(endUserId: Int? = nil) -> UINavigationController {
         let vc = ConversationListViewController()
         vc.endUserId = endUserId
         let navVC = UINavigationController(rootViewController: vc)
@@ -51,6 +51,26 @@ class ConversationListViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let unableToAuthAlert = UIAlertController(title: "Unable to connect to chat", message: "Please try again later", preferredStyle: .alert)
+        unableToAuthAlert.addAction(UIAlertAction.init(title: "OK", style: UIAlertActionStyle.cancel, handler: { (action) in
+            self.dismissVC()
+        }))
+
+        if endUserId == nil, let embedId = DriftDataStore.sharedInstance.embed?.embedId, let userEmail = DriftDataStore.sharedInstance.userEmail, let userId = DriftDataStore.sharedInstance.userId {
+            DriftManager.retrieveDataFromEmbeds(embedId, completion: { (success) in
+                DriftManager.registerUser(userId, email: userEmail, attrs: nil, completion: { (endUserId) in
+                    if let endUserId = endUserId {
+                        self.endUserId = endUserId
+                        self.getConversations()
+                        return
+                    }
+                })
+            })
+            present(unableToAuthAlert, animated: true)
+        }
+        
+        
         setupEmptyState()
         tableView.tableFooterView = UIView(frame: CGRect.zero)
         tableView.delegate = self
@@ -88,22 +108,27 @@ class ConversationListViewController: UIViewController {
     }
     
     func dismissVC() {
+        SVProgressHUD.dismiss()
         dismiss(animated: true, completion: nil)
     }
     
     func getConversations() {
-        DriftAPIManager.getEnrichedConversations(endUserId) { (result) in
-            self.refreshControl.endRefreshing()
-            SVProgressHUD.dismiss()
-            switch result{
-            case .success(let enrichedConversations):
-                self.enrichedConversations = enrichedConversations
-                self.tableView.reloadData()
-                if self.enrichedConversations.count == 0{
-                    self.emptyStateView.isHidden = false
+        if let endUserId = endUserId{
+            DriftAPIManager.getEnrichedConversations(endUserId) { (result) in
+                self.refreshControl.endRefreshing()
+                SVProgressHUD.dismiss()
+                switch result{
+                case .success(let enrichedConversations):
+                    self.enrichedConversations = enrichedConversations
+                    self.tableView.reloadData()
+                    if self.enrichedConversations.count == 0{
+                        self.emptyStateView.isHidden = false
+                    }
+                case .failure(let error):
+                    SVProgressHUD.dismiss()
+                    LoggerManager.log("Unable to get conversations for endUser:  \(self.endUserId): \(error)")
                 }
-            case .failure(let error):
-                LoggerManager.log("Unable to get conversations for endUser:  \(self.endUserId): \(error)")
+                
             }
 
         }
