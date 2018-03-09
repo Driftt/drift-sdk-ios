@@ -15,8 +15,10 @@ struct Auth: Mappable {
     var enduser: User?
     
     init?(map: Map) {
+        let stringAccessToken = map["accessToken"] as? String
+        
         //These fields are required, without them we fail to init the object
-        if map["accessToken"] == nil || map["accessToken"] as? String == ""{
+        if stringAccessToken == nil || stringAccessToken?.count == 0 {
             return nil
         }
     }
