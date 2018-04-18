@@ -35,7 +35,7 @@ extension UIColor {
      - parameter alpha: The Alpha value to be applied to self
      - returns: self with a different alpha
      */
-    func alpha(_ alpha: CGFloat) -> UIColor{
+    func drift_alpha(_ alpha: CGFloat) -> UIColor{
         return self.withAlphaComponent(alpha)
     }
     
@@ -44,8 +44,8 @@ extension UIColor {
      
      - returns: UIColor for text when placed ontop of self
      */
-    func brightnessColor() -> UIColor{
-        if brightness() < 0.7
+    func drift_brightnessColor() -> UIColor{
+        if drift_brightness() < 0.7
         {
             return UIColor.white
         }
@@ -59,7 +59,7 @@ extension UIColor {
      
      - returns: value between 0 and 1 indicating brightness
      */
-    func brightness() -> CGFloat{
+    func drift_brightness() -> CGFloat{
         let components = self.cgColor.components
         let red = components?[0]
         let green = components?[1]

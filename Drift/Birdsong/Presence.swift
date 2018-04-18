@@ -8,7 +8,7 @@
 
 import Foundation
 
-public final class Presence {
+internal final class Presence {
     // MARK: - Convenience typealiases
 
     public typealias PresenceState = [String: [Meta]]
@@ -108,15 +108,15 @@ public final class Presence {
 
     // MARK: - Presence access convenience
 
-    public func metas(id: String) -> [Meta]? {
+    func metas(id: String) -> [Meta]? {
         return state[id]
     }
 
-    public func firstMeta(id: String) -> Meta? {
+    func firstMeta(id: String) -> Meta? {
         return state[id]?.first
     }
 
-    public func firstMetas() -> [String: Meta] {
+    func firstMetas() -> [String: Meta] {
         var result = [String: Meta]()
         state.forEach { id, metas in
             result[id] = metas.first
@@ -125,7 +125,7 @@ public final class Presence {
         return result
     }
 
-    public func firstMetaValue<T>(id: String, key: String) -> T? {
+    func firstMetaValue<T>(id: String, key: String) -> T? {
         guard let meta = state[id]?.first, let value = meta[key] as? T else {
             return nil
         }
@@ -133,7 +133,7 @@ public final class Presence {
         return value
     }
 
-    public func firstMetaValues<T>(key: String) -> [T] {
+    func firstMetaValues<T>(key: String) -> [T] {
         var result = [T]()
         state.forEach { id, metas in
             if let meta = metas.first, let value = meta[key] as? T {

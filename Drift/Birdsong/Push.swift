@@ -8,7 +8,7 @@
 
 import Foundation
 
-public class Push {
+internal class Push {
     public let topic: String
     public let event: String
     public let payload: Socket.Payload
@@ -40,7 +40,7 @@ public class Push {
     // MARK: - Callback registration
 
     @discardableResult
-    public func receive(_ status: String, callback: @escaping (Socket.Payload) -> ()) -> Self {
+    func receive(_ status: String, callback: @escaping (Socket.Payload) -> ()) -> Self {
         if receivedStatus == status,
             let receivedResponse = receivedResponse {
             callback(receivedResponse)
@@ -58,7 +58,7 @@ public class Push {
     }
 
     @discardableResult
-    public func always(_ callback: @escaping () -> ()) -> Self {
+    func always(_ callback: @escaping () -> ()) -> Self {
         alwaysCallbacks.append(callback)
         return self
     }

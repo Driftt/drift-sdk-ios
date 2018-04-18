@@ -8,15 +8,15 @@
 
 import Foundation
 
-open class Channel {
+class Channel {
     // MARK: - Properties
 
     open let topic: String
     open let params: Socket.Payload
     fileprivate weak var socket: Socket?
-    fileprivate(set) open var state: State
+    fileprivate(set) var state: State
 
-    fileprivate(set) open var presence: Presence
+    fileprivate(set) var presence: Presence
 
     fileprivate var callbacks: [String: (Response) -> ()] = [:]
     fileprivate var presenceStateCallback: ((Presence) -> ())?
@@ -42,7 +42,7 @@ open class Channel {
     // MARK: - Control
 
     @discardableResult
-    open func join() -> Push? {
+    func join() -> Push? {
         state = .Joining
 
         return send(Socket.Event.Join, payload: params)?.receive("ok", callback: { response in
@@ -51,7 +51,7 @@ open class Channel {
     }
 
     @discardableResult
-    open func leave() -> Push? {
+    func leave() -> Push? {
         state = .Leaving
 
         return send(Socket.Event.Leave, payload: [:])?.receive("ok", callback: { response in
@@ -64,7 +64,7 @@ open class Channel {
     }
 
     @discardableResult
-    open func send(_ event: String,
+    func send(_ event: String,
                      payload: Socket.Payload) -> Push? {
         let message = Push(event, topic: topic, payload: payload)
         return socket?.send(message)
@@ -81,20 +81,20 @@ open class Channel {
     // MARK: - Callbacks
 
     @discardableResult
-    open func on(_ event: String, callback: @escaping (Response) -> ()) -> Self {
+    func on(_ event: String, callback: @escaping (Response) -> ()) -> Self {
         callbacks[event] = callback
         return self
     }
 
     @discardableResult
-    open func onPresenceUpdate(_ callback: @escaping (Presence) -> ()) -> Self {
+    func onPresenceUpdate(_ callback: @escaping (Presence) -> ()) -> Self {
         presenceStateCallback = callback
         return self
     }
 
     // MARK: - States
 
-    public enum State: String {
+    enum State: String {
         case Closed = "closed"
         case Errored = "errored"
         case Joined = "joined"

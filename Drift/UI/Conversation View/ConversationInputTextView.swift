@@ -70,16 +70,16 @@ class ConversationInputTextView: UITextView {
         }
     }
     
-    public convenience init() {
+    convenience init() {
         self.init(frame: .zero)
     }
     
-    public override init(frame: CGRect, textContainer: NSTextContainer?) {
+    override init(frame: CGRect, textContainer: NSTextContainer?) {
         super.init(frame: frame, textContainer: textContainer)
         setup()
     }
     
-    required public init?(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         setup()
     }
@@ -91,7 +91,7 @@ class ConversationInputTextView: UITextView {
     // MARK: - Setup
     
     /// Sets up the default properties
-    open func setup() {
+     func setup() {
         
         font = UIFont.preferredFont(forTextStyle: .body)
         textContainerInset = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 60)

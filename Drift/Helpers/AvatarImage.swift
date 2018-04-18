@@ -9,9 +9,9 @@
 import UIKit
 import AlamofireImage
 
-@IBDesignable class AvatarView: UIView {
+class AvatarView: UIView {
     
-    @IBInspectable var cornerRadius: CGFloat = 3{
+    var cornerRadius: CGFloat = 3{
         didSet{
             setUpCorners()
         }

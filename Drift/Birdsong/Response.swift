@@ -8,11 +8,11 @@
 
 import Foundation
 
-open class Response {
-    open let ref: String
-    open let topic: String
-    open let event: String
-    open let payload: Socket.Payload
+class Response {
+    let ref: String
+    let topic: String
+    let event: String
+    let payload: Socket.Payload
 
     init?(data: Data) {
         do {

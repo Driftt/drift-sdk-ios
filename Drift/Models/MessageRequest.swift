@@ -40,7 +40,7 @@ class MessageRequest {
     
     func getContextUserAgent() -> String {
 
-        var userAgent = "Mobile App / \(UIDevice.current.modelName) / \(UIDevice.current.systemName) \(UIDevice.current.systemVersion)"
+        var userAgent = "Mobile App / \(UIDevice.current.drift_modelName) / \(UIDevice.current.systemName) \(UIDevice.current.systemVersion)"
         if let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] {
             userAgent.append(" / App Version: \(version)")
         }

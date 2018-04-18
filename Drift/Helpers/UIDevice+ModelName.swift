@@ -10,7 +10,7 @@ import UIKit
 
 extension UIDevice {
     
-    var modelName: String {
+    var drift_modelName: String {
         var systemInfo = utsname()
         uname(&systemInfo)
         let machineMirror = Mirror(reflecting: systemInfo.machine)

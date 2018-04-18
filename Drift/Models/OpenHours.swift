@@ -55,7 +55,7 @@ class OpenHours: Mappable {
     var closes:    String?
     var dayOfWeek: String?
     
-    required public convenience init?(map: Map) {
+    required convenience init?(map: Map) {
         self.init()
     }
     

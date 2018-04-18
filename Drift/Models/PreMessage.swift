@@ -14,7 +14,7 @@ class PreMessage: Mappable {
     var messageBody: String = ""
     var user: User?
     
-    public required init?(map: Map) {
+    required init?(map: Map) {
         
     }
     

@@ -9,7 +9,7 @@
 
 import ObjectMapper
 
-public enum ContentType: String{
+enum ContentType: String{
     case Chat = "CHAT"
     case Annoucement = "ANNOUNCEMENT"
     case Edit = "EDIT"

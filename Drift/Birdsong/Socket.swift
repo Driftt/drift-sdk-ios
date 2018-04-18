@@ -9,19 +9,19 @@
 import Foundation
 import Starscream
 
-public final class Socket {
+final class Socket {
     // MARK: - Convenience aliases
-    public typealias Payload = [String: Any]
+    typealias Payload = [String: Any]
     
     // MARK: - Properties
     
     fileprivate var socket: WebSocket
-    public var enableLogging = true
+    var enableLogging = true
     
-    public var onConnect: (() -> ())?
-    public var onDisconnect: ((Error?) -> ())?
+    var onConnect: (() -> ())?
+    var onDisconnect: ((Error?) -> ())?
     
-    fileprivate(set) public var channels: [String: Channel] = [:]
+    fileprivate(set) var channels: [String: Channel] = [:]
     
     fileprivate static let HeartbeatInterval = Int64(30 * NSEC_PER_SEC)
     fileprivate static let HeartbeatPrefix = "hb-"
@@ -29,7 +29,7 @@ public final class Socket {
     
     fileprivate var awaitingResponses = [String: Push]()
     
-    public var isConnected: Bool {
+    var isConnected: Bool {
         return socket.isConnected
     }
     
@@ -41,7 +41,7 @@ public final class Socket {
         socket.delegate = self
     }
     
-    public convenience init(url: String, params: [String: String]? = nil) {
+    convenience init(url: String, params: [String: String]? = nil) {
         if let parsedURL = URL(string: url) {
             self.init(url: parsedURL, params: params)
         }
@@ -51,7 +51,7 @@ public final class Socket {
         }
     }
     
-    public convenience init(prot: String = "http", host: String = "localhost", port: Int = 4000,
+    convenience init(prot: String = "http", host: String = "localhost", port: Int = 4000,
                             path: String = "socket", transport: String = "websocket",
                             params: [String: String]? = nil, selfSignedSSL: Bool = false) {
         let url = "\(prot)://\(host):\(port)/\(path)/\(transport)"
@@ -60,7 +60,7 @@ public final class Socket {
     
     // MARK: - Connection
     
-    public func connect() {
+    func connect() {
         if socket.isConnected {
             return
         }
@@ -80,13 +80,13 @@ public final class Socket {
     
     // MARK: - Channels
     
-    public func channel(_ topic: String, payload: Payload = [:]) -> Channel {
+    func channel(_ topic: String, payload: Payload = [:]) -> Channel {
         let channel = Channel(socket: self, topic: topic, params: payload)
         channels[topic] = channel
         return channel
     }
     
-    public func remove(_ channel: Channel) {
+    func remove(_ channel: Channel) {
         channel.leave()?.receive("ok") { [weak self] response in
             self?.channels.removeValue(forKey: channel.topic)
         }

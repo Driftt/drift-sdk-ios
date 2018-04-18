@@ -24,13 +24,13 @@ class ConversationViewController: UIViewController {
         case continueConversation(conversationId: Int)
     }
     
-    lazy var emptyState = ConversationEmptyStateView.fromNib() as! ConversationEmptyStateView
+    lazy var emptyState = ConversationEmptyStateView.drift_fromNib() as! ConversationEmptyStateView
     var messages: [Message] = []
     var attachments: [Int: Attachment] = [:]
     var attachmentIds: Set<Int> = []
     var previewItem: DriftPreviewItem?
     var dateFormatter: DriftDateFormatter = DriftDateFormatter()
-    var connectionBarView: ConnectionBarView = ConnectionBarView.fromNib() as! ConnectionBarView
+    var connectionBarView: ConnectionBarView = ConnectionBarView.drift_fromNib() as! ConnectionBarView
     var connectionBarHeightConstraint: NSLayoutConstraint!
     
     var keyboardFrame: CGRect = .zero

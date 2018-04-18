@@ -49,7 +49,7 @@ class PresentationManager: PresentationManagerDelegate {
     }
     
     func didRecieveNewMessages(_ enrichedConversations: [EnrichedConversation]) {
-        if let newMessageView = NewMessageView.fromNib() as? NewMessageView , currentShownView == nil && !conversationIsPresenting() && !enrichedConversations.isEmpty{
+        if let newMessageView = NewMessageView.drift_fromNib() as? NewMessageView , currentShownView == nil && !conversationIsPresenting() && !enrichedConversations.isEmpty{
             
             if let window = UIApplication.shared.keyWindow {
                 currentShownView = newMessageView
@@ -66,7 +66,7 @@ class PresentationManager: PresentationManagerDelegate {
     }
     
     func didRecieveNewMessage(_ message: Message) {
-        if let newMessageView = NewMessageView.fromNib() as? NewMessageView , currentShownView == nil && !conversationIsPresenting() {
+        if let newMessageView = NewMessageView.drift_fromNib() as? NewMessageView , currentShownView == nil && !conversationIsPresenting() {
             
             if let window = UIApplication.shared.keyWindow {
                 currentShownView = newMessageView
@@ -78,7 +78,7 @@ class PresentationManager: PresentationManagerDelegate {
     }
     
     func showAnnouncementCampaign(_ campaign: CampaignMessage, otherCampaigns:[CampaignMessage]) {
-        if let announcementView = AnnouncementView.fromNib() as? AnnouncementView , currentShownView == nil && !conversationIsPresenting() {
+        if let announcementView = AnnouncementView.drift_fromNib() as? AnnouncementView , currentShownView == nil && !conversationIsPresenting() {
             
             if let window = UIApplication.shared.keyWindow {
                 currentShownView = announcementView
@@ -91,7 +91,7 @@ class PresentationManager: PresentationManagerDelegate {
     }
     
     func showExpandedAnnouncement(_ campaign: CampaignMessage) {
-        if let announcementView = AnnouncementExpandedView.fromNib() as? AnnouncementExpandedView, let window = UIApplication.shared.keyWindow , !conversationIsPresenting() {
+        if let announcementView = AnnouncementExpandedView.drift_fromNib() as? AnnouncementExpandedView, let window = UIApplication.shared.keyWindow , !conversationIsPresenting() {
             currentShownView = announcementView
             announcementView.campaign = campaign
             announcementView.delegate = self

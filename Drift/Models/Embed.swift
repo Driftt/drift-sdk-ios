@@ -8,17 +8,17 @@
 
 import ObjectMapper
 
-public enum WidgetStatus: String{
+enum WidgetStatus: String{
     case on = "ON"
     case away = "AWAY"
 }
 
-public enum WidgetMode: String{
+enum WidgetMode: String{
     case manual = "MANUAL"
     case auto   = "AUTO"
 }
 
-public enum UserListMode: String{
+enum UserListMode: String{
     case random = "RANDOM"
     case custom   = "CUSTOM"
 }

@@ -15,7 +15,7 @@ extension UIView {
      - parameter nibNameOrNil: - NibName or nil - If nil the Class name of self is used instead
      - returns: Instance of the class or nil
      */
-    class func fromNib<T : UIView>(_ nibNameOrNil: String? = nil) -> T? {
+    class func drift_fromNib<T : UIView>(_ nibNameOrNil: String? = nil) -> T? {
         var view: T?
         let name: String
         if let nibName = nibNameOrNil {
