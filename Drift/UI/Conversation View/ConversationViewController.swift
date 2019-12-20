@@ -73,11 +73,11 @@ class ConversationViewController: UIViewController {
         }
     }
 
-    var conversationId: Int64?{
-        didSet{
+    var conversationId: Int64? /* {
+        didSet{ // Commented out as useless: isEnabled is always true
             conversationInputView.addButton.isEnabled = true
         }
-    }
+    } */
     
     var keyboardOffsetFrame: CGRect {
         guard let inputFrame = inputAccessoryView?.frame else { return .zero }
@@ -127,7 +127,7 @@ class ConversationViewController: UIViewController {
         tableView.backgroundColor = ColorPalette.backgroundColor
         tableView.separatorStyle = .none
         
-        conversationInputView.addButton.isEnabled = false
+//        conversationInputView.addButton.isEnabled = false // Commented out to show alert that appending attachment requires sending the first message
         conversationInputView.textView.font = UIFont(name: "Avenir-Book", size: 15)
         if let organizationName = DriftDataStore.sharedInstance.embed?.organizationName {
             conversationInputView.textView.placeholder = "Type your message to \(organizationName)..."
@@ -474,6 +474,12 @@ extension ConversationViewController: ConversationInputAccessoryViewDelegate {
     }
     
     func didPressLeftButton() {
+        
+        guard conversationId != nil else {
+            showAlertAttachmentIsUnavailable()
+            return
+        }
+        
         dismissKeyboard()
         let uploadController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         
@@ -498,6 +504,12 @@ extension ConversationViewController: ConversationInputAccessoryViewDelegate {
         
         uploadController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
         present(uploadController, animated: true, completion: nil)
+    }
+    
+    private func showAlertAttachmentIsUnavailable() {
+        let alert = UIAlertController(title: "Please first send a message in order to add attachments to the conversation.", message: nil, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Okay", style: .default, handler: nil))
+        present(alert, animated: true)
     }
     
     func didPressRightButton() {
