@@ -9,7 +9,7 @@
 struct SocketAuth {
     let sessionToken: String
     let userId: String
-    let orgId: Int
+    let orgId: String
 }
 
 class SocketAuthDTO: Codable, DTO {
@@ -18,13 +18,13 @@ class SocketAuthDTO: Codable, DTO {
     
     var sessionToken: String?
     var userId: String?
-    var orgId: Int?
+    var orgId: String?
     
     
     func mapToObject() -> SocketAuth? {
         return SocketAuth(sessionToken: sessionToken ?? "",
                           userId: userId ?? "",
-                          orgId: orgId ?? -1)
+                          orgId: orgId ?? "")
     }
     
     enum CodingKeys: String, CodingKey {

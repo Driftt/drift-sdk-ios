@@ -34,7 +34,7 @@ class SocketManager {
             socket.disconnect()
         }
         
-        socket = Socket(url: getSocketEndpoint(orgId: socketAuth.orgId), params: ["session_token": socketAuth.sessionToken], callbackQueue: socketResponseQueue)
+        socket = Socket(url: getSocketEndpoint(orgId: Int(socketAuth.orgId) ?? -1), params: ["session_token": socketAuth.sessionToken], callbackQueue: socketResponseQueue)
         socket?.enableLogging = DriftManager.sharedInstance.debug
         socket?.onConnect =  {
             self.didConnect()
