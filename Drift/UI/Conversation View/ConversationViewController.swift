@@ -9,7 +9,7 @@
 import UIKit
 import QuickLook
 
-protocol ConversationCellDelegate: class{
+protocol ConversationCellDelegate: AnyObject{
     func presentScheduleOfferingForUserId(userId: Int64)
     func attachmentSelected(_ attachment: Attachment, sender: AnyObject)
 }
