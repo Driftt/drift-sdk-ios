@@ -177,19 +177,19 @@ class ConversationViewController: UIViewController {
             navVC.navigationBar.tintColor = DriftDataStore.sharedInstance.generateForegroundColor()
             navVC.navigationBar.titleTextAttributes = [NSAttributedString.Key.foregroundColor: DriftDataStore.sharedInstance.generateForegroundColor(), NSAttributedString.Key.font: UIFont(name: "AvenirNext-Medium", size: 16)!]
             navigationItem.title = "Conversation"
+            
+            if #available(iOS 15.0, *) {
+                
+                let navigationBarAppearance = UINavigationBarAppearance()
+                navigationBarAppearance.configureWithOpaqueBackground()
+                navigationBarAppearance.backgroundColor = DriftDataStore.sharedInstance.generateBackgroundColor()
+                navigationBarAppearance.titleTextAttributes = [NSAttributedString.Key.foregroundColor: DriftDataStore.sharedInstance.generateForegroundColor(), NSAttributedString.Key.font: UIFont(name: "AvenirNext-Medium", size: 16)!]
+                navVC.navigationBar.standardAppearance = navigationBarAppearance
+                navVC.navigationBar.compactAppearance = navigationBarAppearance
+                navVC.navigationBar.scrollEdgeAppearance = navigationBarAppearance
+            }
         }
         
-        if #available(iOS 15.0, *) {
-            
-            let navigationBarAppearance = UINavigationBarAppearance()
-            navigationBarAppearance.configureWithOpaqueBackground()
-            navigationBarAppearance.backgroundColor = DriftDataStore.sharedInstance.generateBackgroundColor()
-            navigationBarAppearance.titleTextAttributes = [NSAttributedString.Key.foregroundColor: DriftDataStore.sharedInstance.generateForegroundColor(), NSAttributedString.Key.font: UIFont(name: "AvenirNext-Medium", size: 16)!]
-            navVC.navigationBar.standardAppearance = navigationBarAppearance
-            navVC.navigationBar.compactAppearance = navigationBarAppearance
-            navVC.navigationBar.scrollEdgeAppearance = navigationBarAppearance
-        }
-
         NotificationCenter.default.addObserver(self, selector: #selector(ConversationViewController.didOpen), name: UIApplication.willEnterForegroundNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(ConversationViewController.rotated), name: UIDevice.orientationDidChangeNotification, object: nil)
         

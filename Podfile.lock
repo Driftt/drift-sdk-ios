@@ -2,7 +2,7 @@ PODS:
   - Alamofire (5.0.4)
   - AlamofireImage (4.0.3):
     - Alamofire (< 6.0.0, >= 5.0.2)
-  - Drift (2.4.0):
+  - Drift (2.4.1):
     - AlamofireImage (~> 4.0)
     - Starscream (= 3.1.1)
   - Starscream (3.1.1)
@@ -25,9 +25,9 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Alamofire: 0fe5fd24b4298dc377a6550da7d5f1b30e286fcb
   AlamofireImage: 3d1a2010519e58675318735580eb856e88840ff7
-  Drift: a8e369e5c3caadf9881e2161c56844b24010b268
+  Drift: 6cc02680220df9a8ee8b19a0894443b186e7daf5
   Starscream: 4bb2f9942274833f7b4d296a55504dcfc7edb7b0
 
 PODFILE CHECKSUM: 7cd5be47ac4451914767678f2dfb15656815a2f0
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.11.2
