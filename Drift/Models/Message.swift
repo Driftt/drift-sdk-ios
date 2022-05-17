@@ -11,6 +11,8 @@ enum ContentType: String, Codable{
     case Chat = "CHAT"
     case Annoucement = "ANNOUNCEMENT"
     case Edit = "EDIT"
+    case ConversationEvent = "CONVERSATION_EVENT"
+    case BotEvaluation = "BOT_NODE_CONDITION_EVALUATION"
 }
 enum AuthorType: String, Codable{
     case User = "USER"
