@@ -11,6 +11,7 @@ enum ConversationStatus: String, Codable {
     case Open = "OPEN"
     case Closed = "CLOSED"
     case Pending = "PENDING"
+    case BulkSent = "BULK_SENT"
 }
 
 struct Conversation {
