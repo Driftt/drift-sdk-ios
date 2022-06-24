@@ -17,10 +17,16 @@ class PresentationManager: PresentationManagerDelegate {
     
     static var sharedInstance: PresentationManager = PresentationManager()
     weak var currentShownView: CampaignView?
+    private var shouldShowMessagePopup = true
     
     init () {}
+
+    func shouldShowMessagePopup(show: Bool) {
+           shouldShowMessagePopup = show
+    }
         
     func didRecieveNewMessages(_ enrichedConversations: [EnrichedConversation]) {
+        guard shouldShowMessagePopup else { return }
         if let newMessageView = NewMessageView.drift_fromNib() as? NewMessageView , currentShownView == nil && !conversationIsPresenting() && !enrichedConversations.isEmpty{
             
             if let window = UIApplication.shared.keyWindow {
@@ -38,6 +44,7 @@ class PresentationManager: PresentationManagerDelegate {
     }
     
     func didRecieveNewMessage(_ message: Message) {
+        guard shouldShowMessagePopup else { return }
         if let newMessageView = NewMessageView.drift_fromNib() as? NewMessageView , currentShownView == nil && !conversationIsPresenting() {
             
             if let window = UIApplication.shared.keyWindow {

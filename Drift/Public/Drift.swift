@@ -83,4 +83,8 @@ open class Drift: NSObject {
     @objc open class func showAutomatedMessages(_ show: Bool) {
         DriftManager.showAutomatedMessages(show)
     }
+
+    @objc open class func shouldShowMessagePopup(show: Bool) {
+        PresentationManager.sharedInstance.shouldShowMessagePopup(show: show)
+    }
 }
