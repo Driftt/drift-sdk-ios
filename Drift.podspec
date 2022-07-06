@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name = "Drift"
-  spec.version = "2.4.1"
+  spec.version = "2.4.3"
   spec.summary = "Drift Framework for customer communication"
   spec.homepage = "https://github.com/Driftt/drift-sdk-ios"
   spec.license = { type: 'MIT', file: 'LICENSE' }
