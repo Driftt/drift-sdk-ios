@@ -168,7 +168,7 @@ enum DriftConversation2Router: URLRequestConvertible {
     }
     
     func asURLRequest() throws -> URLRequest {
-        var components = URLComponents(string: APIBase.Conversation2.rawValue)
+        var components = URLComponents(string: APIBase.Conversation.rawValue)
         if let accessToken = DriftDataStore.sharedInstance.auth?.accessToken{
             let authItem = URLQueryItem(name: "access_token", value: accessToken)
             components?.queryItems = [authItem]
