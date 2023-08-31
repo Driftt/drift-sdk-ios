@@ -4,6 +4,7 @@ Drift
 
 DriftSDK is the official Drift SDK written in Swift!
 
+# Deprecated – Please see https://devdocs.drift.com/ for more details on how to integrate Drift with your application
 
 # Features:
 - Create conversations from your app
